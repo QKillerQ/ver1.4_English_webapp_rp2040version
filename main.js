@@ -1,7 +1,7 @@
 let port;
 let writer;
 
-let kando = [30, 40, 50, 60, 70, 80, 90, 100, 110]; // 感度保存用
+let kando = [200, 200, 200, 200, 200, 200, 200, 200, 200]; // 感度保存用
 
 const BUTTON_CLICK_EVENT = document.getElementById("connection");
 const BUTTON_CLICK_EVENT_DISC= document.getElementById("disconnection");
@@ -10,9 +10,11 @@ const BUTTON_CLICK_EVENT_request = document.getElementById("requestButton");
 const BUTTON_CLICK_EVENT_save = document.getElementById("saveButton");
 const button = document.getElementById("updateValue");
 const volumeSlider = document.getElementById("volumeSlider");
+const situation_alert = document.getElementById("situation");
+//const BUTTON_CLICK_EVENT_read = document.getElementById("readButton");
 
 let reader; // readerが必要な場合に備えて
-
+situation_alert.textContent = "接続してください"
 
 // シリアルポートの接続処理
 BUTTON_CLICK_EVENT.addEventListener("click", async () => {
@@ -55,6 +57,7 @@ BUTTON_CLICK_EVENT_DISC.addEventListener("click", async () => {
   if (writer) writer.releaseLock(); // writerのロックを解放
   if (reader) reader.releaseLock(); // readerのロックを解放
   if (port) await port.close();
+  situation_alert.textContent = "切断しました"
 });
 
 // データ送信処理
@@ -62,16 +65,20 @@ BUTTON_CLICK_EVENT_send.addEventListener("click", async () => {
   try {
     // "1002"の送信
     await writer.write(new TextEncoder().encode("1002\n"));
-    for (let i = 0; i <= 9; i++){
+    situation_alert.textContent = "感度送信中..."
+    for (let i = 0; i < 9; i++){//
+      await new Promise(resolve => setTimeout(resolve, 100)); // 10ms待機
       const data = `${i}:${kando[i]}`; // iとkando[i]を「:」で結合
-      await writer.write(new TextEncoder().encode(data)); // UTF-8エンコードして送信
+      const data2 =  new TextEncoder().encode(data)
+      await writer.write(data2); // UTF-8エンコードして送信
     }
-    alert("send");
+    //通知する
+    situation_alert.textContent = "感度を送信しました"
   } catch (error) {
     console.error("Error in send:", error);
   }
 });
-//バグはweb側に問題あり、シリアルで試したところ動作したから。
+
 // データ要求処理 
 BUTTON_CLICK_EVENT_request.addEventListener("click", async () => {
   try {
@@ -91,7 +98,7 @@ BUTTON_CLICK_EVENT_request.addEventListener("click", async () => {
           const [index, value] = parts;
 
           // データが正しい範囲であることを確認
-          if (parseInt(index) === i && !isNaN(value)) {
+        //  if (parseInt(index) === i && !isNaN(value)) {
             const textElement = document.getElementById(`text${i}`);
             const volumeSlider = document.getElementById(`volumeSlider${i}`);
 
@@ -100,31 +107,45 @@ BUTTON_CLICK_EVENT_request.addEventListener("click", async () => {
             textElement.textContent = kando[i]; // スライダー横のテキストを更新
 
             isMatched = true; // 正しいデータを処理したらループを抜ける
-          }
+          //}
         } else {
           // データが無効な形式の場合はログに記録
+         // alert("error");
           console.warn(`Invalid data format received: ${decodedData}`);
         }
       }
     }
-    alert("request");
-
-    // alert("ok"); // 最後に一度だけ通知を表示する場合
+    situation_alert.textContent = "感度を受け取りました"
   } catch (error) {
     console.error("Error in request:", error);
   }
 });
 
+BUTTON_CLICK_EVENT_save.addEventListener("click", async () => {
+    await writer.write(new TextEncoder().encode("1001\n"));
+    console.log("1001_saved");
+   situation_alert.textContent = "感度を保存しました"
 
+});
+/*
+BUTTON_CLICK_EVENT_read.addEventListener("click", async () => {
+  await writer.write(new TextEncoder().encode("1003\n"));
+  console.log("1003_read");
+  alert("read");
+});
+
+*/
 
 // スライダーの入力処理
 for (let i = 0; i <= 8; i++) {
-  const volumeSlider = document.getElementById(`volumeSlider${i}`);
   const textElement = document.getElementById(`text${i}`);
+  const volumeSlider = document.getElementById(`volumeSlider${i}`);
 
   volumeSlider.addEventListener("input", () => {
     const volume = volumeSlider.value; // スライダーの値を取得
     textElement.textContent = volume; // スライダー横のテキストを更新
+    kando[i] = volumeSlider.value;
+  
   });
 }
 
