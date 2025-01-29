@@ -247,8 +247,6 @@ header {
   white-space: nowrap; /* テキストが折り返されないようにする */
 }
 
-
-
 .container {
   display: flex;
   align-items: center;
