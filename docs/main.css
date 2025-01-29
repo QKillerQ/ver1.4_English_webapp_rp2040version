@@ -246,3 +246,52 @@ header {
   font-weight: bold;
   white-space: nowrap; /* テキストが折り返されないようにする */
 }
+
+
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+details {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  width: 700px; /* 幅を広くする */
+  background-color: #f9f9f9;
+  flex-grow: 1; /* 可能なら横いっぱいに広げる */
+}
+
+summary {
+  font-weight: bold;
+  background-color: #36da69;
+  color: white;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+details[open] summary {
+  background-color: #36da69;
+}
+
+li {
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+img {
+  margin: 5px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  width: 40px; /* 画像も少し大きく */
+  height: 40px;
+}

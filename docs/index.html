@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>HIDtaiko_rp2040</title>
   <link rel="stylesheet" href="main.css">
+  
 </head>
 <body>
+  
   <h1>HIDtaiko</h1>
   <h2 id="situation" class="situation"></h2></h2>
   <p>
@@ -21,6 +23,7 @@
     <img src="img\スクリーンショット 2025-01-28 105242.png" width="50" height="50">
     <input id="volumeSlider0" type="range" min="1" max="255" step="1" value="1">
     <span id="text0"></span>
+    
   </p>
 
   <p>
@@ -70,9 +73,36 @@
     <input id="volumeSlider8" type="range" min="1" max="50" step="1" value="1">
     <span id="text8"></span>
   </p>
-  
-  
 
+  <details id=pattern1>
+    <summary>説明</summary>
+    <li>感度</li>
+    <img src="img\スクリーンショット 2025-01-28 105317.png" width="30" height="30">
+    <img src="img\スクリーンショット 2025-01-28 105317.png" width="30" height="30">
+    <img src="img\スクリーンショット 2025-01-28 105259.png" width="30" height="30">
+    <img src="img\スクリーンショット 2025-01-28 105242.png" width="30" height="30">
+    これからは感度の調節です。これらの値は閾値になっていて、センサーからの電圧が一定を超えた場合にキー入力を行う様になっています。
+    したがって、値が低いほど感度が低くなります。
+    多重が起きる箇所は感度を上げましょう。
+    
+    <li>Bdelay</li>
+    これはキーが入力されてから次の入力を受け付けるまでの時間です。この値が大きいほど多重が起きにくくなります。しかし、大きすぎると連打が伸びなくなるので注意してください。
+    標準:12 単位:ms
+    <li>Cdelay</li>
+    これは先ほどのBdelayの縁だけ版です。説明は同じです。
+    標準:30 単位:ms
+    <li>Ddelay</li>
+    これは面が入力されてから、縁の入力を制限する時間です。面を叩いたときに縁が多重してしまう場合に値を上げてください。
+    標準:35 単位:ms
+    <li>Hdelay</li>
+    これは公式アプリや一部のシュミレーターで必要な入力制限です。「メモ帳ではキー入力ができるけど、シュミレーターでは入力ができない」このような場合に値を設定してください。
+    標準:18 単位:ms
+    
+  </details>
+    
+  
+  
+  <link rel="icon" href="favicon.ico">
   <script src="main.js"></script>
 </body>
 </html>
