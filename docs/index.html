@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HIDtaiko_rp2040</title>
   <link rel="stylesheet" href="main.css">
-  
+  <link rel="icon" href="img\favicon.ico">
 </head>
 <body>
   
@@ -21,28 +21,34 @@
   </p>
   <p>
     <img src="img\スクリーンショット 2025-01-28 105242.png" width="50" height="50">
-    <input id="volumeSlider0" type="range" min="1" max="255" step="1" value="1">
+    <input id="volumeSlider0" type="range" min="0" max="500" step="5" value="1">
     <span id="text0"></span>
     
   </p>
 
   <p>
     <img src="img\スクリーンショット 2025-01-28 105259.png" width="50" height="50">
-    <input id="volumeSlider1" type="range" min="1" max="255" step="1" value="1">
+    <input id="volumeSlider1" type="range" min="0" max="500" step="5" value="1">
     <span id="text1"></span>
   </p>
 
   
   <p>
     <img src="img\スクリーンショット 2025-01-28 105317.png" width="50" height="50">
-    <input id="volumeSlider2" type="range" min="1" max="255" step="1" value="1">
+    <input id="volumeSlider2" type="range" min="0" max="500" step="5" value="1">
     <span id="text2"></span>
   </p>
 
   <p>
     <img src="img\スクリーンショット 2025-01-28 105332.png" width="50" height="50">
-    <input id="volumeSlider3" type="range" min="1" max="255" step="1" value="1">
+    <input id="volumeSlider3" type="range" min="0" max="500" step="5" value="1">
     <span id="text3"></span>
+  </p>
+
+  <p>
+    <span class="label">Adelay</span>
+    <input id="volumeSlider8" type="range" min="1" max="50" step="1" value="1">
+    <span id="text8"></span>
   </p>
 
   <p>
@@ -68,23 +74,27 @@
     <span id="text7"></span>
   </p>
  
-  <p>
-    <span class="label">none</span>
-    <input id="volumeSlider8" type="range" min="1" max="50" step="1" value="1">
-    <span id="text8"></span>
-  </p>
 
   <details id=pattern1>
     <summary>説明</summary>
+    <li>1."接続"で接続器を選択する</li>
+    <li>2."感度要求"で接続器に保存されている感度を呼び出す</li>
+    <li>3.感度を調整する</li>
+    <li>4."感度送信"で接続器に感度を送信する</li>
+    <li>5.必要に応じて"保存"を行う（電源がなくなっても設定が保存される）</li>
+    -------------↓各項目の説明↓-------------
     <li>感度</li>
     <img src="img\スクリーンショット 2025-01-28 105317.png" width="30" height="30">
     <img src="img\スクリーンショット 2025-01-28 105317.png" width="30" height="30">
     <img src="img\スクリーンショット 2025-01-28 105259.png" width="30" height="30">
     <img src="img\スクリーンショット 2025-01-28 105242.png" width="30" height="30">
     これからは感度の調節です。これらの値は閾値になっていて、センサーからの電圧が一定を超えた場合にキー入力を行う様になっています。
-    したがって、値が低いほど感度が低くなります。
+    したがって、値が低いほど感度が高くなります。
     多重が起きる箇所は感度を上げましょう。
     
+    <li>Adelay</li>
+    これはキーが入力されてから次にそのキーが入力を受け付けるまでの時間です。この値が大きいほど多重が起きにくくなります。しかし、大きすぎると連打が伸びなくなるので注意してください。
+    標準:17 単位:ms
     <li>Bdelay</li>
     これはキーが入力されてから次の入力を受け付けるまでの時間です。この値が大きいほど多重が起きにくくなります。しかし、大きすぎると連打が伸びなくなるので注意してください。
     標準:12 単位:ms
@@ -102,7 +112,7 @@
     
   
   
-  <link rel="icon" href="docs\img\favicon.ico">
+
   <script src="main.js"></script>
 </body>
 </html>
