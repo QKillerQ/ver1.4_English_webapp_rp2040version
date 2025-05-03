@@ -148,4 +148,14 @@ for (let i = 0; i <= 8; i++) {
   
   });
 }
+for (let i = 0; i <= 8; i++) {
+  const textElement = document.getElementById(`text${i}`);
+  const volumeSlider = document.getElementById(`volumeSlider${i}`);
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const volume = volumeSlider.value; // スライダーの初期値を取得
+    textElement.textContent = volume; // スライダー横のテキストを初期化
+    kando[i] = volumeSlider.value; // kando 配列に初期値を設定
+  });
+}
 

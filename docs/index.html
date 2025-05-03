@@ -8,9 +8,14 @@
   <link rel="icon" href="img\favicon.ico">
 </head>
 <body>
+
+  <div class="container">
+    <div class="controls">
   
   <h1>HIDtaiko</h1>
-  <h2 id="situation" class="situation"></h2></h2>
+  <div style="text-align: center;">
+    <h2 id="situation" class="situation"></h2>
+  </div>
   <p>
   <button id="connection">接続</button>
   <button id="disconnection">切断</button>
@@ -21,27 +26,27 @@
   </p>
   <p>
     <img src="img\スクリーンショット 2025-01-28 105242.png" width="50" height="50">
-    <input id="volumeSlider1" type="range" min="0" max="500" step="5" value="1">
+    <input id="volumeSlider1" type="range" min="0" max="500" step="5" value="80">
     <span id="text1"></span>
     
   </p>
 
   <p>
     <img src="img\スクリーンショット 2025-01-28 105259.png" width="50" height="50">
-    <input id="volumeSlider0" type="range" min="0" max="500" step="5" value="1">
+    <input id="volumeSlider0" type="range" min="0" max="500" step="5" value="130">
     <span id="text0"></span>
   </p>
 
   
   <p>
     <img src="img\スクリーンショット 2025-01-28 105317.png" width="50" height="50">
-    <input id="volumeSlider2" type="range" min="0" max="500" step="5" value="1">
+    <input id="volumeSlider2" type="range" min="0" max="500" step="5" value="130">
     <span id="text2"></span>
   </p>
 
   <p>
     <img src="img\スクリーンショット 2025-01-28 105332.png" width="50" height="50">
-    <input id="volumeSlider3" type="range" min="0" max="500" step="5" value="1">
+    <input id="volumeSlider3" type="range" min="0" max="500" step="5" value="80">
     <span id="text3"></span>
   </p>
 
@@ -53,63 +58,83 @@
 
   <p>
     <span class="label">Bdelay</span>  
-    <input id="volumeSlider4" type="range" min="1" max="80" step="1" value="1">
+    <input id="volumeSlider4" type="range" min="1" max="80" step="1" value="10">
     <span id="text4"></span>
   </p>
 
   <p>
     <span class="label">Cdelay</span>  
-    <input id="volumeSlider5" type="range" min="1" max="80" step="1" value="1">
+    <input id="volumeSlider5" type="range" min="1" max="80" step="1" value="30">
     <span id="text5"></span>
   </p>
   <p>
     <span class="label">Ddelay</span>
-    <input id="volumeSlider6" type="range" min="1" max="80" step="1" value="1">
+    <input id="volumeSlider6" type="range" min="1" max="80" step="1" value="32">
     <span id="text6"></span>
   </p>
  
   <p>
     <span class="label">Hdelay</span>
-    <input id="volumeSlider7" type="range" min="0" max="80" step="1" value="1">
+    <input id="volumeSlider7" type="range" min="0" max="80" step="1" value="0">
     <span id="text7"></span>
   </p>
  
+  </div>
+  
+  <div class="explanation">
+    <h2 id="explanation2">【説明】</h2>
 
-  <details id=pattern1>
-    <summary>説明</summary>
-    <li>1."接続"で接続器を選択する</li>
-    <li>2."感度要求"で接続器に保存されている感度を呼び出す</li>
+
+    <li>1.「接続」で接続器を選択する</li>
+    <li>2.「感度送信」でデフォルトの感度を書き込むか、「感度要求」で感度を読み込む</li>
     <li>3.感度を調整する</li>
-    <li>4."感度送信"で接続器に感度を送信する</li>
-    <li>5.必要に応じて"保存"を行う（電源がなくなっても設定が保存される）</li>
+    <li>4.「感度送信」で接続器に感度を送信する</li>
+    <li>5.必要に応じて「保存」を行う（接続器のメモリに保存されます）</li>
     -------------↓各項目の説明↓-------------
     <li>感度</li>
-    <img src="img\スクリーンショット 2025-01-28 105317.png" width="30" height="30">
+    <img src="img\スクリーンショット 2025-01-28 105332.png" width="30" height="30">
     <img src="img\スクリーンショット 2025-01-28 105317.png" width="30" height="30">
     <img src="img\スクリーンショット 2025-01-28 105259.png" width="30" height="30">
     <img src="img\スクリーンショット 2025-01-28 105242.png" width="30" height="30">
-    これからは感度の調節です。これらの値は閾値になっていて、センサーからの電圧が一定を超えた場合にキー入力を行う様になっています。
+    それぞれの感度です。これらの値は閾値になっていて、センサーからの電圧が一定を超えた場合にキー入力を行う様になっています。
     したがって、値が低いほど感度が高くなります。
-    多重が起きる箇所は感度を上げましょう。
+    多重入力が発生する箇所は感度の値を高くしましょう。
     
     <li>Adelay</li>
-    これはキーが入力されてから次にそのキーが入力を受け付けるまでの時間です。この値が大きいほど多重が起きにくくなります。しかし、大きすぎると連打が伸びなくなるので注意してください。
-    標準:17 単位:ms
+    これはキーが入力されてから次にそのキーが入力を受け付けるまでの時間です。この値が大きいほど多重入力が起きにくくなります。
+    これは叩いた時にその部分のみで、多重入力が発生するようなら値を上げてください。
+    標準:1 （単位：ms）
     <li>Bdelay</li>
-    これはキーが入力されてから次の入力を受け付けるまでの時間です。この値が大きいほど多重が起きにくくなります。しかし、大きすぎると連打が伸びなくなるので注意してください。
-    標準:12 単位:ms
+    これは面のキーが入力されてから次の面の入力を受け付けるまでの時間です。この値が大きいほど多重入力が起きにくくなります。
+    しかし、大きすぎると面の連打が伸びなくなります。
+    標準:12 （単位：ms）
     <li>Cdelay</li>
-    これは先ほどのBdelayの縁だけ版です。説明は同じです。
-    標準:30 単位:ms
+    これはBdelayの縁バージョンです。説明はBdelayと同様です。
+    標準:30 （単位：ms）
     <li>Ddelay</li>
-    これは面が入力されてから、縁の入力を制限する時間です。面を叩いたときに縁が多重してしまう場合に値を上げてください。
-    標準:35 単位:ms
+    これは、面が入力されてから、縁の入力を制限する時間、兼縁が入力されてから、面の入力を制限する時間です。面を叩いたときに縁が多重してしまう場合、その逆の場合値を上げてください。
+    標準:32 （単位：ms）
     <li>Hdelay</li>
-    これは公式アプリや一部のシュミレーターで必要な入力制限です。「メモ帳ではキー入力ができるけど、シュミレーターでは入力ができない」このような場合に値を設定してください。
-    標準:18 単位:ms
-    
-  </details>
-    
+    これは公式アプリや一部のシミュレーターで必要な入力制限です。「メモ帳ではキー入力ができるけど、シミュレーターでは入力ができない」このような場合に値を設定してください。
+    標準:18or0 （単位：ms）
+
+    <h3>【感度調整のやり方】</h3>
+    ※基本的には1.2.3を繰り返し、できるだけ高い感度、低いdelayを目指してください。
+  <p>
+   1.感度設定
+   最初にデフォルトの感度に設定してから、バチで叩き無反応が起きない値を探します。
+  </p>
+  <p>
+   2.delay調整
+   多重入力が起きない様にそれぞれの値を上げます。大体値を35以上になるとロール処理が失敗しやすくなります。。
+  </p>
+  <p>
+   3.感度を調整
+   delay調整でカバーできない多重入力が発生した場合は感度を下げてください。
+  </p>
+
+   </div>
+  </div>
   
   
 
