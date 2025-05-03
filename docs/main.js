@@ -11,7 +11,7 @@ const BUTTON_CLICK_EVENT_save = document.getElementById("saveButton");
 const button = document.getElementById("updateValue");
 const volumeSlider = document.getElementById("volumeSlider");
 const situation_alert = document.getElementById("situation");
-//const BUTTON_CLICK_EVENT_read = document.getElementById("readButton");
+//const BUTTON_CLICK_EVENT_read = document.getElementById("readButton");a
 
 let reader; // readerが必要な場合に備えて
 situation_alert.textContent = "接続してください"
