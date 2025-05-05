@@ -185,8 +185,6 @@ p span:first-child {
   /* スライダーとボタンの配置 */
   p {
     display: flex;
-    align-items: center;
-    justify-content: center;
     margin: 15px 0;
   }
   
@@ -319,6 +317,15 @@ img {
   width: 40px; /* 画像も少し大きく */
   height: 40px;
 }
+
+.no-style-img {
+  all: unset; /* すべての継承スタイルを無効化 */
+  display: inline; /* 通常のインライン画像に戻す */
+  vertical-align: middle; /* テキストと揃える */
+  width: 200px; /* 画像も少し大きく */
+  height: 200px;
+}
+
 
 .sidebar {
   position: fixed;
