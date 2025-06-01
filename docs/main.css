@@ -1,6 +1,6 @@
 /* 全体のスタイリングa */
 body {
-    height: 140vh;/*画面上部の間*/
+    min-height: 100vh; /* 画面全体には最低限広がる */
     display: flex;
     flex-direction: column;
     align-items: center;
