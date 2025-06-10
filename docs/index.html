@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIDtaiko Controller Configuration</title>
+    <title>HIDtaiko RP2040 English Interface</title>
+    <link rel="icon" href="img/favicon.ico">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,7 +24,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
@@ -69,19 +70,20 @@
 
         .button-row {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
+            margin-bottom: 15px;
         }
 
         .btn {
             background: linear-gradient(135deg, #4299e1, #3182ce);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 18px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
@@ -147,6 +149,7 @@
             display: flex;
             gap: 15px;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
         .slider-container {
@@ -162,6 +165,7 @@
         .slider-container.compact {
             flex: 1;
             padding: 15px;
+            min-width: 200px;
         }
 
         .slider-container:hover {
@@ -321,14 +325,18 @@
                 align-items: stretch;
                 gap: 10px;
             }
+
+            .drum-row {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>HIDtaiko Controller</h1>
-            <div class="subtitle">Real-time Sensitivity & Timing Configuration</div>
+            <h1>HIDtaiko RP2040 Controller</h1>
+            <div class="subtitle">English Interface - Real-time Sensitivity & Timing Configuration</div>
         </div>
 
         <div class="status-info">
@@ -337,15 +345,16 @@
 
         <div class="connection-panel">
             <div class="button-row">
-                <button id="connect" class="btn">Connect Device</button>
-                <button id="reset" class="btn" disabled>Reset to Previous Board Values</button>
-                <button id="resetDefault" class="btn" disabled>Reset to Defaults</button>
-                <button id="save" class="btn save" disabled>Save/Send Current Values to Board</button>
+                <button id="connect" class="btn">Connect</button>
+                <button id="disconnect" class="btn" disabled>Disconnect</button>
+                <button id="sendButton" class="btn" disabled>Send Settings</button>
+                <button id="requestButton" class="btn" disabled>Request Settings</button>
+                <button id="save" class="btn save" disabled>Save to Memory</button>
             </div>
         </div>
 
         <div class="section">
-            <h2 class="section-title">Drum Pad Sensitivity</h2>
+            <h2 class="section-title">Drum Pad Sensitivity (Lower = More Sensitive)</h2>
             
             <div class="drum-row">
                 <div class="slider-container compact">
@@ -353,9 +362,9 @@
                         <div>
                             <div class="slider-label">A3 - Left Rim</div>
                         </div>
-                        <span id="valueDx3" class="slider-value">50</span>
+                        <span id="valueDx3" class="slider-value">80</span>
                     </div>
-                    <input type="range" min="1" max="100" value="50" id="dx3"/>
+                    <input type="range" min="0" max="500" step="5" value="80" id="dx3"/>
                 </div>
 
                 <div class="slider-container compact">
@@ -363,9 +372,9 @@
                         <div>
                             <div class="slider-label">A2 - Left Surface</div>
                         </div>
-                        <span id="valueDx2" class="slider-value">50</span>
+                        <span id="valueDx2" class="slider-value">130</span>
                     </div>
-                    <input type="range" min="1" max="100" value="50" id="dx2"/>
+                    <input type="range" min="0" max="500" step="5" value="130" id="dx2"/>
                 </div>
 
                 <div class="slider-container compact">
@@ -373,9 +382,9 @@
                         <div>
                             <div class="slider-label">A1 - Right Surface</div>
                         </div>
-                        <span id="valueDx1" class="slider-value">50</span>
+                        <span id="valueDx1" class="slider-value">130</span>
                     </div>
-                    <input type="range" min="1" max="100" value="50" id="dx1"/>
+                    <input type="range" min="0" max="500" step="5" value="130" id="dx1"/>
                 </div>
 
                 <div class="slider-container compact">
@@ -383,426 +392,356 @@
                         <div>
                             <div class="slider-label">A0 - Right Rim</div>
                         </div>
-                        <span id="valueDx0" class="slider-value">50</span>
+                        <span id="valueDx0" class="slider-value">80</span>
                     </div>
-                    <input type="range" min="1" max="100" value="50" id="dx0"/>
+                    <input type="range" min="0" max="500" step="5" value="80" id="dx0"/>
                 </div>
             </div>
         </div>
 
         <div class="section">
-            <h2 class="section-title">Input Cooldown Timers</h2>
+            <h2 class="section-title">Input Delay Timers (milliseconds)</h2>
             
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">Timer A - Same Pad Lockout</div>
-                        <div class="drum-label">Prevents double-hits on same pad</div>
+                        <div class="slider-label">A-Delay - Same Pad Lockout</div>
+                        <div class="drum-label">Time before same pad can trigger again</div>
                     </div>
-                    <span id="valueDxa" class="slider-value">20</span>
+                    <span id="valueDx8" class="slider-value">1</span>
                 </div>
-                <input type="range" min="1" max="100" value="20" id="dxa"/>
+                <input type="range" min="1" max="50" step="1" value="1" id="dx8"/>
             </div>
 
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">Timer B - Center Pad Lockout</div>
-                        <div class="drum-label">A1/A2 lockout after any pad hit</div>
+                        <div class="slider-label">B-Delay - Surface Pad Lockout</div>
+                        <div class="drum-label">Surface pad lockout after any hit</div>
                     </div>
-                    <span id="valueDxb" class="slider-value">15</span>
+                    <span id="valueDx4" class="slider-value">10</span>
                 </div>
-                <input type="range" min="1" max="100" value="15" id="dxb"/>
+                <input type="range" min="1" max="80" step="1" value="10" id="dx4"/>
             </div>
 
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">Timer C - Rim Pad Lockout</div>
-                        <div class="drum-label">A0/A3 lockout after any pad hit</div>
+                        <div class="slider-label">C-Delay - Rim Pad Lockout</div>
+                        <div class="drum-label">Rim pad lockout after any hit</div>
                     </div>
-                    <span id="valueDxc" class="slider-value">15</span>
+                    <span id="valueDx5" class="slider-value">30</span>
                 </div>
-                <input type="range" min="1" max="100" value="15" id="dxc"/>
+                <input type="range" min="1" max="80" step="1" value="30" id="dx5"/>
             </div>
 
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">Timer P - Cross Lockout</div>
-                        <div class="drum-label">A1/A2 lockout after A0/A3 hit</div>
+                        <div class="slider-label">D-Delay - Cross Lockout</div>
+                        <div class="drum-label">Cross-lockout between surface and rim</div>
                     </div>
-                    <span id="valueDxp" class="slider-value">10</span>
+                    <span id="valueDx6" class="slider-value">32</span>
                 </div>
-                <input type="range" min="1" max="100" value="10" id="dxp"/>
+                <input type="range" min="1" max="80" step="1" value="32" id="dx6"/>
             </div>
 
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">HA - Hold Adjustment</div>
-                        <div class="drum-label">Game compatibility (usually 0)</div>
+                        <div class="slider-label">H-Delay - Hold Adjustment</div>
+                        <div class="drum-label">Compatibility for rhythm games (usually 0 or 20)</div>
                     </div>
-                    <span id="valueDxh" class="slider-value">0</span>
+                    <span id="valueDx7" class="slider-value">0</span>
                 </div>
-                <input type="range" min="0" max="30" value="0" id="dxh"/>
+                <input type="range" min="0" max="80" step="1" value="0" id="dx7"/>
             </div>
         </div>
 
         <div class="instructions">
             <h2>Setup Instructions</h2>
             <ol>
-                <li><strong>Set controller to SW mode</strong> and restart the device</li>
-                <li><strong>Click "Connect Device"</strong> and select "Arduino Leonardo" from the list</li>
-                <li><strong>Current settings automatically loaded</strong> from your controller</li>
-                <li><strong>Adjust sensitivity sliders</strong> - Changes preview in real-time</li>
-                <li><strong>Use "Reset to Previous Board Values"</strong> to return to original values</li>
-                <li><strong>Use "Reset to Defaults"</strong> for standard HIDtaiko settings</li>
-                <li><strong>Click "Save/Send"</strong> to permanently store changes to controller</li>
+                <li><strong>Click "Connect"</strong> and select your HIDtaiko device (Chrome/Edge browser required)</li>
+                <li><strong>Click "Request Settings"</strong> to load current values from controller</li>
+                <li><strong>Adjust sliders</strong> - Changes are sent in real-time</li>
+                <li><strong>Click "Save to Memory"</strong> to permanently store settings</li>
             </ol>
-            <p><em>Note: Slider changes are temporary until you click "Save/Send Current Values to Board".</em></p>
+            <p><em>Note: Sensitivity values are thresholds - lower numbers = higher sensitivity</em></p>
         </div>
 
         <div class="parameter-help">
             <h3>Parameter Guide</h3>
             
             <div class="parameter-item">
-                <strong>Timer A:</strong>
-                Prevents the same pad from triggering multiple times rapidly. Example: After A0 is hit, A0 cannot trigger again for this duration.
+                <strong>Sensitivity:</strong>
+                Threshold values for piezo sensors. When sensor voltage exceeds this value, a key press is triggered. Lower values = more sensitive.
             </div>
             
             <div class="parameter-item">
-                <strong>Timer B:</strong>
-                After any pad (A0, A1, A2, A3) is hit, prevents A1 and A2 (center pads) from triggering for this duration.
+                <strong>A-Delay:</strong>
+                Prevents the same pad from triggering multiple times rapidly. Increase if you get unwanted double-hits on the same pad.
             </div>
             
             <div class="parameter-item">
-                <strong>Timer C:</strong>
-                After any pad (A0, A1, A2, A3) is hit, prevents A0 and A3 (rim pads) from triggering for this duration.
+                <strong>B-Delay:</strong>
+                Lockout time for surface pads after any pad is hit. Prevents multiple surface hits but don't set too high or rapid surface hits won't register.
             </div>
             
             <div class="parameter-item">
-                <strong>Timer P:</strong>
-                After A0 or A3 (rim pads) are hit, prevents A1 and A2 (center pads) from triggering for this duration.
+                <strong>C-Delay:</strong>
+                Lockout time for rim pads after any pad is hit. Similar to B-Delay but for rim pads.
             </div>
             
             <div class="parameter-item">
-                <strong>HA (Hold Adjustment):</strong>
-                Usually keep at 0. Increase only if the controller works in text editors but not in rhythm games.
-                <br><em>Examples: Taiko no Tatsujin Festival = 18, OpenTaiko = 0</em>
+                <strong>D-Delay:</strong>
+                Cross-lockout between surface and rim pads. Prevents rim from triggering when surface is hit and vice versa.
+            </div>
+            
+            <div class="parameter-item">
+                <strong>H-Delay:</strong>
+                Special timing adjustment for certain rhythm games. Use 0 for most games, try 20 if controller works in text editors but not in games.
             </div>
         </div>
 
         <div class="footer">
-            <p><strong>HIDtaiko English Interface v1.4</strong></p>
-            <p>Enhanced version with improved UI and English translations</p>
+            <p><strong>HIDtaiko RP2040 English Interface</strong></p>
+            <p>Enhanced English version with modern UI</p>
             <p>Based on original work by <a href="https://github.com/kasasiki3" target="_blank">kasasiki3</a></p>
         </div>
     </div>
 
     <script>
-        var serial = {};
+        // Global variables
+        let device = null;
+        let isConnected = false;
+        
+        // Get UI elements
+        const connectBtn = document.getElementById('connect');
+        const disconnectBtn = document.getElementById('disconnect');
+        const sendBtn = document.getElementById('sendButton');
+        const requestBtn = document.getElementById('requestButton');
+        const saveBtn = document.getElementById('save');
+        const statusDisplay = document.getElementById('status');
+        
+        // Slider mappings to match original Japanese interface
+        const sliders = {
+            dx0: document.getElementById('dx0'),   // volumeSlider0 - A0 Right Rim
+            dx1: document.getElementById('dx1'),   // volumeSlider1 - A1 Right Surface  
+            dx2: document.getElementById('dx2'),   // volumeSlider2 - A2 Left Surface
+            dx3: document.getElementById('dx3'),   // volumeSlider3 - A3 Left Rim
+            dx4: document.getElementById('dx4'),   // volumeSlider4 - B-delay
+            dx5: document.getElementById('dx5'),   // volumeSlider5 - C-delay
+            dx6: document.getElementById('dx6'),   // volumeSlider6 - D-delay
+            dx7: document.getElementById('dx7'),   // volumeSlider7 - H-delay
+            dx8: document.getElementById('dx8')    // volumeSlider8 - A-delay
+        };
+        
+        const valueDisplays = {
+            dx0: document.getElementById('valueDx0'),
+            dx1: document.getElementById('valueDx1'),
+            dx2: document.getElementById('valueDx2'),
+            dx3: document.getElementById('valueDx3'),
+            dx4: document.getElementById('valueDx4'),
+            dx5: document.getElementById('valueDx5'),
+            dx6: document.getElementById('valueDx6'),
+            dx7: document.getElementById('valueDx7'),
+            dx8: document.getElementById('valueDx8')
+        };
 
-        (function() {
-            'use strict';
+        // Update slider background visual
+        function updateSliderBackground(slider) {
+            const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+            slider.style.background = `linear-gradient(90deg, #4299e1 ${value}%, #e2e8f0 ${value}%)`;
+        }
 
-            serial.getPorts = function() {
-                return navigator.usb.getDevices().then(devices => {
-                    return devices.map(device => new serial.Port(device));
-                });
-            };
-
-            serial.requestPort = function() {
-                const filters = [
-                    { 'vendorId': 0x0f0d, 'productId': 0x0092 },
-                    { 'vendorId': 0x2341, 'productId': 0x8036 },
-                    { 'vendorId': 0x2341, 'productId': 0x804d },
-                    { 'vendorId': 0x2341, 'productId': 0x804e },
-                    { 'vendorId': 0x2341, 'productId': 0x804f },
-                    { 'vendorId': 0x2341, 'productId': 0x8050 },
-                    { 'vendorId': 0x2341, 'productId': 0x8052 },
-                    { 'vendorId': 0x2341, 'productId': 0x8053 },
-                    { 'vendorId': 0x2341, 'productId': 0x8054 },
-                    { 'vendorId': 0x2341, 'productId': 0x8055 },
-                    { 'vendorId': 0x2341, 'productId': 0x8056 },
-                    { 'vendorId': 0x2341, 'productId': 0x8057 },
-                    { 'vendorId': 0x239A },
-                ];
-                return navigator.usb.requestDevice({ 'filters': filters }).then(
-                    device => new serial.Port(device)
-                );
-            };
-
-            serial.Port = function(device) {
-                this.device_ = device;
-                this.interfaceNumber_ = 2;
-                this.endpointIn_ = 5;
-                this.endpointOut_ = 4;
-            };
-
-            serial.Port.prototype.connect = function() {
-                let readLoop = () => {
-                    this.device_.transferIn(this.endpointIn_, 64).then(result => {
-                        this.onReceive(result.data);
-                        readLoop();
-                    }, error => {
-                        this.onReceiveError(error);
-                    });
-                };
-
-                return this.device_.open()
-                    .then(() => {
-                        if (this.device_.configuration === null) {
-                            return this.device_.selectConfiguration(1);
-                        }
-                    })
-                    .then(() => {
-                        var configurationInterfaces = this.device_.configuration.interfaces;
-                        configurationInterfaces.forEach(element => {
-                            element.alternates.forEach(elementalt => {
-                                if (elementalt.interfaceClass == 0xff) {
-                                    this.interfaceNumber_ = element.interfaceNumber;
-                                    elementalt.endpoints.forEach(elementendpoint => {
-                                        if (elementendpoint.direction == "out") {
-                                            this.endpointOut_ = elementendpoint.endpointNumber;
-                                        }
-                                        if (elementendpoint.direction == "in") {
-                                            this.endpointIn_ = elementendpoint.endpointNumber;
-                                        }
-                                    });
-                                }
-                            });
-                        });
-                    })
-                    .then(() => this.device_.claimInterface(this.interfaceNumber_))
-                    .then(() => this.device_.selectAlternateInterface(this.interfaceNumber_, 0))
-                    .then(() => this.device_.controlTransferOut({
-                        'requestType': 'class',
-                        'recipient': 'interface',
-                        'request': 0x22,
-                        'value': 0x01,
-                        'index': this.interfaceNumber_}))
-                    .then(() => {
-                        readLoop();
-                    });
-            };
-
-            serial.Port.prototype.disconnect = function() {
-                return this.device_.controlTransferOut({
-                        'requestType': 'class',
-                        'recipient': 'interface',
-                        'request': 0x22,
-                        'value': 0x00,
-                        'index': this.interfaceNumber_})
-                    .then(() => this.device_.close());
-            };
-
-            serial.Port.prototype.send = function(data) {
-                return this.device_.transferOut(this.endpointOut_, data);
-            };
-        })();
-
-        (function() {
-            'use strict';
-
-            document.addEventListener('DOMContentLoaded', event => {
-                console.log('DOM loaded, initializing interface...');
-                
-                let connectButton = document.querySelector("#connect");
-                let resetButton = document.querySelector("#reset");
-                let resetDefaultButton = document.querySelector("#resetDefault");
-                let saveButton = document.querySelector("#save");
-                let statusDisplay = document.querySelector('#status');
-                
-                if (!connectButton || !resetButton || !resetDefaultButton || !saveButton || !statusDisplay) {
-                    console.error('Failed to find required elements');
-                    return;
+        // Initialize all sliders
+        Object.values(sliders).forEach(slider => {
+            updateSliderBackground(slider);
+            slider.addEventListener('input', function() {
+                const key = Object.keys(sliders).find(k => sliders[k] === this);
+                valueDisplays[key].textContent = this.value;
+                updateSliderBackground(this);
+                if (isConnected) {
+                    sendCurrentValues();
                 }
-
-                let sliders = {
-                    dx0: document.querySelector('#dx0'),
-                    dx1: document.querySelector('#dx1'),
-                    dx2: document.querySelector('#dx2'),
-                    dx3: document.querySelector('#dx3'),
-                    dxa: document.querySelector('#dxa'),
-                    dxb: document.querySelector('#dxb'),
-                    dxc: document.querySelector('#dxc'),
-                    dxp: document.querySelector('#dxp'),
-                    dxh: document.querySelector('#dxh')
-                };
-                
-                let valueDisplays = {
-                    dx0: document.querySelector('#valueDx0'),
-                    dx1: document.querySelector('#valueDx1'),
-                    dx2: document.querySelector('#valueDx2'),
-                    dx3: document.querySelector('#valueDx3'),
-                    dxa: document.querySelector('#valueDxa'),
-                    dxb: document.querySelector('#valueDxb'),
-                    dxc: document.querySelector('#valueDxc'),
-                    dxp: document.querySelector('#valueDxp'),
-                    dxh: document.querySelector('#valueDxh')
-                };
-
-                let port;
-                let receivedDataArray = [];
-                let originalBoardValues = [];
-                const defaultValues = [25, 25, 25, 25, 20, 15, 15, 10, 0];
-
-                function updateSliderBackground(slider) {
-                    const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-                    slider.style.background = `linear-gradient(90deg, #4299e1 ${value}%, #e2e8f0 ${value}%)`;
-                }
-
-                Object.values(sliders).forEach(slider => {
-                    updateSliderBackground(slider);
-                });
-
-                function connect() {
-                    port.connect().then(() => {
-                        statusDisplay.textContent = 'Current board settings loaded';
-                        statusDisplay.className = 'status connected';
-                        connectButton.textContent = 'Disconnect Device';
-                        resetButton.disabled = false;
-                        resetDefaultButton.disabled = false;
-                        saveButton.disabled = false;
-
-                        port.onReceive = data => {
-                            let textDecoder = new TextDecoder();
-                            let decodedText = textDecoder.decode(data);
-                            console.log('Received:', decodedText);
-
-                            let dataString = decodedText.trim();
-                            let dataArray = dataString.split("\n").map(Number);
-                            
-                            for (let i = 0; i < 9; i++) {
-                                if (dataArray[i] !== undefined) {
-                                    receivedDataArray[i] = dataArray[i];
-                                    if (originalBoardValues.length < 9) {
-                                        originalBoardValues[i] = dataArray[i];
-                                    }
-                                }
-                            }
-
-                            const sliderKeys = ['dx0', 'dx1', 'dx2', 'dx3', 'dxa', 'dxb', 'dxc', 'dxp', 'dxh'];
-                            sliderKeys.forEach((key, index) => {
-                                if (receivedDataArray[index] !== undefined) {
-                                    sliders[key].value = receivedDataArray[index];
-                                    valueDisplays[key].textContent = receivedDataArray[index];
-                                    updateSliderBackground(sliders[key]);
-                                }
-                            });
-                        };
-
-                        port.onReceiveError = error => {
-                            console.error('Receive error:', error);
-                        };
-                    }, error => {
-                        statusDisplay.textContent = `Error: ${error}`;
-                        statusDisplay.className = 'status';
-                    });
-                }
-
-                function onUpdate() {
-                    if (!port) return;
-
-                    let view = new Uint8Array(9);
-                    const sliderKeys = ['dx0', 'dx1', 'dx2', 'dx3', 'dxa', 'dxb', 'dxc', 'dxp', 'dxh'];
-                    sliderKeys.forEach((key, index) => {
-                        view[index] = parseInt(sliders[key].value);
-                    });
-                    
-                    port.send(view);
-                }
-
-                function resetToOriginal() {
-                    if (originalBoardValues.length === 0) return;
-
-                    const sliderKeys = ['dx0', 'dx1', 'dx2', 'dx3', 'dxa', 'dxb', 'dxc', 'dxp', 'dxh'];
-                    sliderKeys.forEach((key, index) => {
-                        if (originalBoardValues[index] !== undefined) {
-                            sliders[key].value = originalBoardValues[index];
-                            valueDisplays[key].textContent = originalBoardValues[index];
-                            updateSliderBackground(sliders[key]);
-                        }
-                    });
-                    onUpdate();
-                }
-
-                function resetToDefaults() {
-                    const sliderKeys = ['dx0', 'dx1', 'dx2', 'dx3', 'dxa', 'dxb', 'dxc', 'dxp', 'dxh'];
-                    sliderKeys.forEach((key, index) => {
-                        sliders[key].value = defaultValues[index];
-                        valueDisplays[key].textContent = defaultValues[index];
-                        updateSliderBackground(sliders[key]);
-                    });
-                    onUpdate();
-                }
-
-                function saveToBoard() {
-                    if (!port) return;
-
-                    let view = new Uint8Array(1);
-                    view[0] = 0;
-                    
-                    port.send(view).then(() => {
-                        const originalText = saveButton.textContent;
-                        saveButton.textContent = 'Saved!';
-                        saveButton.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
-                        
-                        setTimeout(() => {
-                            saveButton.textContent = originalText;
-                            saveButton.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
-                        }, 2000);
-                    });
-                }
-
-                Object.entries(sliders).forEach(([key, slider]) => {
-                    slider.addEventListener('input', function() {
-                        valueDisplays[key].textContent = this.value;
-                        updateSliderBackground(this);
-                        onUpdate();
-                    });
-                });
-
-                connectButton.addEventListener('click', function() {
-                    if (port) {
-                        port.disconnect();
-                        connectButton.textContent = 'Connect Device';
-                        statusDisplay.textContent = 'No device connected';
-                        statusDisplay.className = 'status';
-                        resetButton.disabled = true;
-                        resetDefaultButton.disabled = true;
-                        saveButton.disabled = true;
-                        port = null;
-                        originalBoardValues = [];
-                    } else {
-                        serial.requestPort().then(selectedPort => {
-                            port = selectedPort;
-                            connect();
-                        }).catch(error => {
-                            statusDisplay.textContent = `Connection failed: ${error}`;
-                            statusDisplay.className = 'status';
-                        });
-                    }
-                });
-
-                resetButton.addEventListener('click', resetToOriginal);
-                resetDefaultButton.addEventListener('click', resetToDefaults);
-                saveButton.addEventListener('click', saveToBoard);
-
-                serial.getPorts().then(ports => {
-                    if (ports.length == 0) {
-                        statusDisplay.textContent = 'No device found - Click Connect';
-                        statusDisplay.className = 'status';
-                    } else {
-                        statusDisplay.textContent = 'Connecting...';
-                        statusDisplay.className = 'status';
-                        port = ports[0];
-                        connect();
-                    }
-                });
             });
-        })();
+        });
+
+        // WebUSB Connection
+        async function connectDevice() {
+            try {
+                const filters = [
+                    { vendorId: 0x2E8A }, // Raspberry Pi Pico
+                    { vendorId: 0x239A }  // Adafruit
+                ];
+                
+                device = await navigator.usb.requestDevice({ filters });
+                await device.open();
+                
+                if (device.configuration === null) {
+                    await device.selectConfiguration(1);
+                }
+                
+                await device.claimInterface(0);
+                
+                isConnected = true;
+                statusDisplay.textContent = 'Connected to HIDtaiko RP2040';
+                statusDisplay.className = 'status connected';
+                
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                sendBtn.disabled = false;
+                requestBtn.disabled = false;
+                saveBtn.disabled = false;
+                
+                // Start listening for data
+                readLoop();
+                
+            } catch (error) {
+                console.error('Connection failed:', error);
+                statusDisplay.textContent = `Connection failed: ${error.message}`;
+                statusDisplay.className = 'status';
+            }
+        }
+
+        async function disconnectDevice() {
+            if (device) {
+                await device.close();
+                device = null;
+                isConnected = false;
+                
+                statusDisplay.textContent = 'Disconnected';
+                statusDisplay.className = 'status';
+                
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendBtn.disabled = true;
+                requestBtn.disabled = true;
+                saveBtn.disabled = true;
+            }
+        }
+
+        async function readLoop() {
+            if (!device || !isConnected) return;
+            
+            try {
+                const result = await device.transferIn(1, 64);
+                if (result.data && result.data.byteLength > 0) {
+                    const decoder = new TextDecoder();
+                    const text = decoder.decode(result.data);
+                    console.log('Received:', text);
+                    
+                    // Parse received data and update sliders
+                    parseReceivedData(text);
+                }
+                
+                // Continue reading
+                setTimeout(readLoop, 10);
+            } catch (error) {
+                console.error('Read error:', error);
+                if (isConnected) {
+                    setTimeout(readLoop, 100);
+                }
+            }
+        }
+
+        function parseReceivedData(data) {
+            // Parse data format from original Japanese interface
+            try {
+                const lines = data.trim().split('\n');
+                const values = lines.map(line => parseInt(line.trim())).filter(v => !isNaN(v));
+                
+                if (values.length >= 9) {
+                    // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
+                    const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
+                    
+                    values.forEach((value, index) => {
+                        if (mapping[index] && sliders[mapping[index]]) {
+                            sliders[mapping[index]].value = value;
+                            valueDisplays[mapping[index]].textContent = value;
+                            updateSliderBackground(sliders[mapping[index]]);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Parse error:', error);
+            }
+        }
+
+        async function sendCurrentValues() {
+            if (!device || !isConnected) return;
+            
+            try {
+                // Send data in the format expected by the RP2040 firmware
+                const data = new Uint8Array([
+                    parseInt(sliders.dx1.value), // A1 - volumeSlider1
+                    parseInt(sliders.dx0.value), // A0 - volumeSlider0  
+                    parseInt(sliders.dx2.value), // A2 - volumeSlider2
+                    parseInt(sliders.dx3.value), // A3 - volumeSlider3
+                    parseInt(sliders.dx4.value), // B - volumeSlider4
+                    parseInt(sliders.dx5.value), // C - volumeSlider5
+                    parseInt(sliders.dx6.value), // D - volumeSlider6
+                    parseInt(sliders.dx7.value), // H - volumeSlider7
+                    parseInt(sliders.dx8.value)  // A - volumeSlider8
+                ]);
+                
+                await device.transferOut(1, data);
+                console.log('Sent values:', Array.from(data));
+            } catch (error) {
+                console.error('Send error:', error);
+            }
+        }
+
+        async function requestValues() {
+            if (!device || !isConnected) return;
+            
+            try {
+                // Send request command (based on original interface)
+                const data = new Uint8Array([255]); // Request command
+                await device.transferOut(1, data);
+                console.log('Requested current values');
+            } catch (error) {
+                console.error('Request error:', error);
+            }
+        }
+
+        async function saveToMemory() {
+            if (!device || !isConnected) return;
+            
+            try {
+                // Send save command
+                const data = new Uint8Array([254]); // Save command
+                await device.transferOut(1, data);
+                console.log('Save command sent');
+                
+                // Visual feedback
+                const originalText = saveBtn.textContent;
+                saveBtn.textContent = 'Saved!';
+                saveBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+                
+                setTimeout(() => {
+                    saveBtn.textContent = originalText;
+                    saveBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Save error:', error);
+            }
+        }
+
+        // Event listeners
+        connectBtn.addEventListener('click', connectDevice);
+        disconnectBtn.addEventListener('click', disconnectDevice);
+        sendBtn.addEventListener('click', sendCurrentValues);
+        requestBtn.addEventListener('click', requestValues);
+        saveBtn.addEventListener('click', saveToMemory);
+
+        // Check for WebUSB support
+        if (!navigator.usb) {
+            statusDisplay.textContent = 'WebUSB not supported. Use Chrome or Edge browser.';
+            statusDisplay.className = 'status';
+            connectBtn.disabled = true;
+        }
     </script>
 </body>
 </html>
