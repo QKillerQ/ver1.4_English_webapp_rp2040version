@@ -162,6 +162,22 @@
             transition: all 0.3s ease;
         }
 
+        .slider-container.surface {
+            border-left: 4px solid #e53e3e;
+        }
+
+        .slider-container.surface .slider-value {
+            background: #e53e3e;
+        }
+
+        .slider-container.surface input[type="range"]::-webkit-slider-thumb {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+        }
+
+        .slider-container.surface input[type="range"]::-moz-range-thumb {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+        }
+
         .slider-container.compact {
             flex: 1;
             padding: 15px;
@@ -349,53 +365,54 @@
                 <button id="disconnect" class="btn" disabled>Disconnect</button>
                 <button id="sendButton" class="btn" disabled>Send Settings</button>
                 <button id="requestButton" class="btn" disabled>Request Settings</button>
-                <button id="save" class="btn save" disabled>Save to Memory</button>
             </div>
         </div>
 
         <div class="section">
             <h2 class="section-title">Drum Pad Sensitivity (Lower = More Sensitive)</h2>
             
-            <div class="drum-row">
-                <div class="slider-container compact">
-                    <div class="slider-header">
-                        <div>
-                            <div class="slider-label">A3 - Left Rim</div>
-                        </div>
-                        <span id="valueDx3" class="slider-value">80</span>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <div>
+                        <div class="slider-label">A3 - Left Rim</div>
+                        <div class="drum-label">Outer edge, left side</div>
                     </div>
-                    <input type="range" min="0" max="500" step="5" value="80" id="dx3"/>
+                    <span id="valueDx3" class="slider-value">80</span>
                 </div>
+                <input type="range" min="0" max="500" step="5" value="80" id="dx3"/>
+            </div>
 
-                <div class="slider-container compact">
-                    <div class="slider-header">
-                        <div>
-                            <div class="slider-label">A2 - Left Surface</div>
-                        </div>
-                        <span id="valueDx2" class="slider-value">130</span>
+            <div class="slider-container surface">
+                <div class="slider-header">
+                    <div>
+                        <div class="slider-label">A2 - Left Surface</div>
+                        <div class="drum-label">Main drum surface, left side</div>
                     </div>
-                    <input type="range" min="0" max="500" step="5" value="130" id="dx2"/>
+                    <span id="valueDx2" class="slider-value">130</span>
                 </div>
+                <input type="range" min="0" max="500" step="5" value="130" id="dx2"/>
+            </div>
 
-                <div class="slider-container compact">
-                    <div class="slider-header">
-                        <div>
-                            <div class="slider-label">A1 - Right Surface</div>
-                        </div>
-                        <span id="valueDx1" class="slider-value">130</span>
+            <div class="slider-container surface">
+                <div class="slider-header">
+                    <div>
+                        <div class="slider-label">A1 - Right Surface</div>
+                        <div class="drum-label">Main drum surface, right side</div>
                     </div>
-                    <input type="range" min="0" max="500" step="5" value="130" id="dx1"/>
+                    <span id="valueDx1" class="slider-value">130</span>
                 </div>
+                <input type="range" min="0" max="500" step="5" value="130" id="dx1"/>
+            </div>
 
-                <div class="slider-container compact">
-                    <div class="slider-header">
-                        <div>
-                            <div class="slider-label">A0 - Right Rim</div>
-                        </div>
-                        <span id="valueDx0" class="slider-value">80</span>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <div>
+                        <div class="slider-label">A0 - Right Rim</div>
+                        <div class="drum-label">Outer edge, right side</div>
                     </div>
-                    <input type="range" min="0" max="500" step="5" value="80" id="dx0"/>
+                    <span id="valueDx0" class="slider-value">80</span>
                 </div>
+                <input type="range" min="0" max="500" step="5" value="80" id="dx0"/>
             </div>
         </div>
 
@@ -405,7 +422,7 @@
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">A-Delay - Same Pad Lockout</div>
+                        <div class="slider-label">Delay Setting #1 - Same Pad Lockout</div>
                         <div class="drum-label">Time before same pad can trigger again</div>
                     </div>
                     <span id="valueDx8" class="slider-value">1</span>
@@ -416,7 +433,7 @@
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">B-Delay - Surface Pad Lockout</div>
+                        <div class="slider-label">Delay Setting #2 - Surface Pad Lockout</div>
                         <div class="drum-label">Surface pad lockout after any hit</div>
                     </div>
                     <span id="valueDx4" class="slider-value">10</span>
@@ -427,7 +444,7 @@
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">C-Delay - Rim Pad Lockout</div>
+                        <div class="slider-label">Delay Setting #3 - Rim Pad Lockout</div>
                         <div class="drum-label">Rim pad lockout after any hit</div>
                     </div>
                     <span id="valueDx5" class="slider-value">30</span>
@@ -438,7 +455,7 @@
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">D-Delay - Cross Lockout</div>
+                        <div class="slider-label">Delay Setting #4 - Cross Lockout</div>
                         <div class="drum-label">Cross-lockout between surface and rim</div>
                     </div>
                     <span id="valueDx6" class="slider-value">32</span>
@@ -449,7 +466,7 @@
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
-                        <div class="slider-label">H-Delay - Hold Adjustment</div>
+                        <div class="slider-label">Delay Setting #5 - Hold Adjustment</div>
                         <div class="drum-label">Compatibility for rhythm games (usually 0 or 20)</div>
                     </div>
                     <span id="valueDx7" class="slider-value">0</span>
@@ -464,7 +481,7 @@
                 <li><strong>Click "Connect"</strong> and select your HIDtaiko device (Chrome/Edge browser required)</li>
                 <li><strong>Click "Request Settings"</strong> to load current values from controller</li>
                 <li><strong>Adjust sliders</strong> - Changes are sent in real-time</li>
-                <li><strong>Click "Save to Memory"</strong> to permanently store settings</li>
+                <li><strong>Use "Send Settings"</strong> to manually update controller if needed</li>
             </ol>
             <p><em>Note: Sensitivity values are thresholds - lower numbers = higher sensitivity</em></p>
         </div>
@@ -478,27 +495,27 @@
             </div>
             
             <div class="parameter-item">
-                <strong>A-Delay:</strong>
+                <strong>Delay Setting #1:</strong>
                 Prevents the same pad from triggering multiple times rapidly. Increase if you get unwanted double-hits on the same pad.
             </div>
             
             <div class="parameter-item">
-                <strong>B-Delay:</strong>
+                <strong>Delay Setting #2:</strong>
                 Lockout time for surface pads after any pad is hit. Prevents multiple surface hits but don't set too high or rapid surface hits won't register.
             </div>
             
             <div class="parameter-item">
-                <strong>C-Delay:</strong>
-                Lockout time for rim pads after any pad is hit. Similar to B-Delay but for rim pads.
+                <strong>Delay Setting #3:</strong>
+                Lockout time for rim pads after any pad is hit. Similar to Delay Setting #2 but for rim pads.
             </div>
             
             <div class="parameter-item">
-                <strong>D-Delay:</strong>
+                <strong>Delay Setting #4:</strong>
                 Cross-lockout between surface and rim pads. Prevents rim from triggering when surface is hit and vice versa.
             </div>
             
             <div class="parameter-item">
-                <strong>H-Delay:</strong>
+                <strong>Delay Setting #5:</strong>
                 Special timing adjustment for certain rhythm games. Use 0 for most games, try 20 if controller works in text editors but not in games.
             </div>
         </div>
@@ -520,7 +537,6 @@
         const disconnectBtn = document.getElementById('disconnect');
         const sendBtn = document.getElementById('sendButton');
         const requestBtn = document.getElementById('requestButton');
-        const saveBtn = document.getElementById('save');
         const statusDisplay = document.getElementById('status');
         
         // Slider mappings to match original Japanese interface
@@ -592,7 +608,6 @@
                 disconnectBtn.disabled = false;
                 sendBtn.disabled = false;
                 requestBtn.disabled = false;
-                saveBtn.disabled = false;
                 
                 // Start listening for data
                 readLoop();
@@ -617,7 +632,6 @@
                 disconnectBtn.disabled = true;
                 sendBtn.disabled = true;
                 requestBtn.disabled = true;
-                saveBtn.disabled = true;
             }
         }
 
@@ -734,7 +748,6 @@
         disconnectBtn.addEventListener('click', disconnectDevice);
         sendBtn.addEventListener('click', sendCurrentValues);
         requestBtn.addEventListener('click', requestValues);
-        saveBtn.addEventListener('click', saveToMemory);
 
         // Check for WebUSB support
         if (!navigator.usb) {
