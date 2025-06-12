@@ -613,34 +613,20 @@ Object.values(sliders).forEach(slider => {
 // Web Serial API Connection (FIXED VERSION)
 async function connectDevice() {
     try {
-        // Check for already paired devices first
-        const availablePorts = await navigator.serial.getPorts();
-        let targetPort = null;
+        // Always show device selection - don't auto-connect to paired devices
+        // This ensures the user sees the device selection dialog
+        console.log('Requesting device selection...');
         
-        // Look for previously paired HIDtaiko device
-        for (const serialPort of availablePorts) {
-            const info = serialPort.getInfo();
-            // Check for RP2040 vendor IDs
-            if (info.usbVendorId === 0x2E8A ||  // Raspberry Pi Foundation
-                info.usbVendorId === 0x239A ||  // Adafruit RP2040
-                info.usbVendorId === 0xCAFE) {   // TinyUSB default
-                targetPort = serialPort;
-                console.log('Found paired HIDtaiko device:', info);
-                break;
-            }
-        }
+        const targetPort = await navigator.serial.requestPort({
+            filters: [
+                { usbVendorId: 0x2E8A }, // RP2040 official - Raspberry Pi Foundation
+                { usbVendorId: 0x239A }, // Adafruit RP2040
+                { usbVendorId: 0xCAFE }  // TinyUSB fallback
+            ]
+        });
         
-        // If no paired device found, request new connection
-        if (!targetPort) {
-            console.log('No paired device found, requesting new connection...');
-            targetPort = await navigator.serial.requestPort({
-                filters: [
-                    { usbVendorId: 0x2E8A }, // RP2040 official
-                    { usbVendorId: 0x239A }, // Adafruit RP2040
-                    { usbVendorId: 0xCAFE }  // TinyUSB fallback
-                ]
-            });
-        }
+        console.log('Device selected:', targetPort.getInfo());
+        console.log('Device selected:', targetPort.getInfo());
         
         // Open serial connection with RP2040 settings
         await targetPort.open({
@@ -678,6 +664,8 @@ async function connectDevice() {
             errorMessage = 'Device busy. Close other programs using this device.';
         } else if (error.name === 'InvalidStateError') {
             errorMessage = 'Device already in use. Try disconnecting first.';
+        } else if (error.name === 'NotSupportedError') {
+            errorMessage = 'Web Serial API not supported. Use Chrome 89+ or Edge 89+.';
         } else {
             errorMessage = `Connection failed: ${error.message}`;
         }
