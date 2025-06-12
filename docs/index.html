@@ -626,12 +626,9 @@
             try {
                 console.log('Calling navigator.serial.requestPort...');
                 
-                // Filter for RP2040 devices (like Japanese interface)
+                // Show all serial devices (like Japanese interface)
                 const port = await navigator.serial.requestPort({
-                    filters: [
-                        { usbVendorId: 0x2E8A }, // Raspberry Pi Foundation (RP2040)
-                        { usbVendorId: 0x239A }  // Adafruit RP2040
-                    ]
+                    filters: [] // Empty filters = show all devices
                 });
                 
                 console.log('Device selected:', port.getInfo());
