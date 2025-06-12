@@ -380,6 +380,7 @@
                 <button id="disconnect" class="btn" disabled>Disconnect</button>
                 <button id="sendButton" class="btn" disabled>Send Settings</button>
                 <button id="requestButton" class="btn" disabled>Request Settings</button>
+                <button id="saveButton" class="btn save" disabled>Save to Memory</button>
             </div>
         </div>
 
@@ -656,6 +657,10 @@
                 sendBtn.disabled = false;
                 requestBtn.disabled = false;
                 
+                // Enable save button
+                const saveBtn = document.getElementById('saveButton');
+                if (saveBtn) saveBtn.disabled = false;
+                
                 readLoop();
                 
                 console.log('HIDtaiko connected successfully via Serial!');
@@ -711,6 +716,9 @@
             disconnectBtn.disabled = true;
             sendBtn.disabled = true;
             requestBtn.disabled = true;
+            
+            const saveBtn = document.getElementById('saveButton');
+            if (saveBtn) saveBtn.disabled = true;
         }
 
         async function readLoop() {
@@ -722,13 +730,22 @@
                     if (done) break;
                     
                     if (value && value.trim()) {
-                        console.log('Received from device:', value.trim());
+                        console.log('Raw data received:', value);
+                        console.log('Data length:', value.length);
+                        console.log('Data as bytes:', Array.from(new TextEncoder().encode(value)));
                         
-                        // Try to parse any response from device
+                        // Try to parse as response
                         parseReceivedData(value);
                         
-                        // Show raw data in status for debugging
-                        statusDisplay.textContent = `Data received: ${value.trim().substring(0, 50)}...`;
+                        // Also try parsing as individual characters/numbers
+                        const chars = value.split('');
+                        console.log('Individual characters:', chars);
+                        
+                        // Look for numeric patterns
+                        const numbers = value.match(/\d+/g);
+                        if (numbers) {
+                            console.log('Found numbers in response:', numbers);
+                        }
                     }
                 }
             } catch (error) {
@@ -739,37 +756,51 @@
         }
 
         function parseReceivedData(data) {
-            console.log('Parsing received data:', data);
+            console.log('=== PARSING RECEIVED DATA ===');
+            console.log('Type:', typeof data);
+            console.log('Content:', data);
+            console.log('Length:', data.length);
             
             try {
-                // The device might send binary data back - let's handle both
-                if (typeof data === 'string') {
-                    // Text data
-                    const lines = data.trim().split('\n');
-                    console.log('Split into lines:', lines);
-                    
-                    const values = [];
-                    for (const line of lines) {
-                        const cleaned = line.trim();
-                        if (cleaned && !isNaN(cleaned)) {
-                            values.push(parseInt(cleaned));
-                        }
+                // Method 1: Try parsing as newline-separated values
+                const lines = data.trim().split('\n');
+                console.log('Split by newlines:', lines);
+                
+                const values = [];
+                lines.forEach((line, index) => {
+                    const trimmed = line.trim();
+                    console.log(`Line ${index}: "${trimmed}"`);
+                    if (trimmed && !isNaN(trimmed)) {
+                        values.push(parseInt(trimmed));
                     }
-                    
-                    console.log('Extracted values:', values);
-                    
-                    if (values.length >= 9) {
-                        updateSlidersWithValues(values);
-                    }
+                });
+                
+                console.log('Extracted numeric values:', values);
+                
+                // Method 2: Try parsing as space-separated values
+                const spaceValues = data.trim().split(/\s+/).map(v => parseInt(v.trim())).filter(v => !isNaN(v));
+                console.log('Space-separated values:', spaceValues);
+                
+                // Method 3: Try parsing as comma-separated values
+                const commaValues = data.trim().split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
+                console.log('Comma-separated values:', commaValues);
+                
+                // Use whichever method gave us 9 values
+                let finalValues = [];
+                if (values.length >= 9) finalValues = values;
+                else if (spaceValues.length >= 9) finalValues = spaceValues;
+                else if (commaValues.length >= 9) finalValues = commaValues;
+                
+                console.log('Final values to use:', finalValues);
+                
+                if (finalValues.length >= 9) {
+                    console.log('SUCCESS: Found 9+ values, updating sliders');
+                    updateSlidersWithValues(finalValues);
                 } else {
-                    // Binary data - convert to array
-                    const values = Array.from(new Uint8Array(data));
-                    console.log('Binary values received:', values);
-                    
-                    if (values.length >= 9) {
-                        updateSlidersWithValues(values);
-                    }
+                    console.log(`Only found ${finalValues.length} values, need at least 9`);
+                    statusDisplay.textContent = `Received ${finalValues.length} values, need 9 for complete settings`;
                 }
+                
             } catch (error) {
                 console.error('Parse error:', error);
             }
@@ -831,18 +862,52 @@
             if (!port || !isConnected || !writer) return;
             
             try {
-                console.log('Requesting values (binary format)...');
+                console.log('Requesting values from device...');
                 
-                // Send request command as binary (like original interface)
-                const requestCommand = new Uint8Array([255]); // 255 = request command
+                // Try the exact command the Japanese interface uses
+                const requestCommand = new Uint8Array([255]); // Standard request command
                 
                 await writer.write(requestCommand);
-                console.log('Binary request sent');
-                statusDisplay.textContent = 'Requested settings from device (binary)';
+                console.log('Request command sent');
+                statusDisplay.textContent = 'Requesting settings from device...';
                 
             } catch (error) {
                 console.error('Request error:', error);
                 statusDisplay.textContent = 'Request failed: ' + error.message;
+            }
+        }
+
+        async function saveToMemory() {
+            if (!port || !isConnected || !writer) return;
+            
+            try {
+                console.log('Saving settings to device memory...');
+                
+                // Send save command (254 is commonly used for save)
+                const saveCommand = new Uint8Array([254]);
+                
+                await writer.write(saveCommand);
+                console.log('Save command sent');
+                
+                statusDisplay.textContent = 'Settings saved to device memory!';
+                statusDisplay.className = 'status connected';
+                
+                // Visual feedback on save button
+                const saveBtn = document.getElementById('saveButton');
+                if (saveBtn) {
+                    const originalText = saveBtn.textContent;
+                    saveBtn.textContent = 'Saved!';
+                    saveBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+                    
+                    setTimeout(() => {
+                        saveBtn.textContent = originalText;
+                        saveBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
+                    }, 2000);
+                }
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                statusDisplay.textContent = 'Save failed: ' + error.message;
             }
         }
 
@@ -851,6 +916,11 @@
         disconnectBtn.addEventListener('click', disconnectDevice);
         sendBtn.addEventListener('click', sendCurrentValues);
         requestBtn.addEventListener('click', requestValues);
+        
+        const saveBtn = document.getElementById('saveButton');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', saveToMemory);
+        }
 
         // Check for Web Serial API support
         if (!navigator.serial) {
