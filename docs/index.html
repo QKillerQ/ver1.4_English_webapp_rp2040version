@@ -378,10 +378,9 @@
             <div class="button-row">
                 <button id="connect" class="btn">Connect</button>
                 <button id="disconnect" class="btn" disabled>Disconnect</button>
-                <button id="sendSensitivity" class="btn" disabled>Send Sensitivity</button>
-                <button id="requestSensitivity" class="btn" disabled>Request Sensitivity</button>
-                <button id="sensitivityTransmission" class="btn" disabled>Sensitivity Transmission</button>
-                <button id="saveButton" class="btn save" disabled>Save</button>
+                <button id="defaultValues" class="btn" disabled>Default Values</button>
+                <button id="saveToDevice" class="btn save" disabled>Save To Device</button>
+                <button id="requestValues" class="btn" disabled>Request Loaded Values</button>
             </div>
         </div>
 
@@ -563,10 +562,9 @@
         // Get UI elements
         const connectBtn = document.getElementById('connect');
         const disconnectBtn = document.getElementById('disconnect');
-        const sendSensitivityBtn = document.getElementById('sendSensitivity');
-        const requestSensitivityBtn = document.getElementById('requestSensitivity');
-        const sensitivityTransmissionBtn = document.getElementById('sensitivityTransmission');
-        const saveBtn = document.getElementById('saveButton');
+        const defaultValuesBtn = document.getElementById('defaultValues');
+        const saveToDeviceBtn = document.getElementById('saveToDevice');
+        const requestValuesBtn = document.getElementById('requestValues');
         const statusDisplay = document.getElementById('status');
 
         // Slider mappings to match original Japanese interface
@@ -657,10 +655,9 @@
                 
                 connectBtn.disabled = true;
                 disconnectBtn.disabled = false;
-                sendSensitivityBtn.disabled = false;
-                requestSensitivityBtn.disabled = false;
-                sensitivityTransmissionBtn.disabled = false;
-                saveBtn.disabled = false;
+                defaultValuesBtn.disabled = false;
+                saveToDeviceBtn.disabled = false;
+                requestValuesBtn.disabled = false;
                 
                 readLoop();
                 
@@ -715,10 +712,9 @@
             
             connectBtn.disabled = false;
             disconnectBtn.disabled = true;
-            sendSensitivityBtn.disabled = true;
-            requestSensitivityBtn.disabled = true;
-            sensitivityTransmissionBtn.disabled = true;
-            saveBtn.disabled = true;
+            defaultValuesBtn.disabled = true;
+            saveToDeviceBtn.disabled = true;
+            requestValuesBtn.disabled = true;
         }
 
         async function readLoop() {
@@ -935,10 +931,9 @@
         // Event listeners
         connectBtn.addEventListener('click', connectDevice);
         disconnectBtn.addEventListener('click', disconnectDevice);
-        sendSensitivityBtn.addEventListener('click', sendCurrentValues);
-        requestSensitivityBtn.addEventListener('click', requestValues);
-        sensitivityTransmissionBtn.addEventListener('click', sensitivityTransmission);
-        saveBtn.addEventListener('click', saveToMemory);
+        defaultValuesBtn.addEventListener('click', loadDefaultValues);
+        saveToDeviceBtn.addEventListener('click', saveCurrentValuesToDevice);
+        requestValuesBtn.addEventListener('click', requestLoadedValues);
 
         // Check for Web Serial API support
         if (!navigator.serial) {
