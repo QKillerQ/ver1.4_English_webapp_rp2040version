@@ -610,55 +610,54 @@
             });
         });
 
-        // WebUSB Connection (WORKING VERSION - FIXED)
+        // Web Serial API Connection (MATCHES JAPANESE INTERFACE)
         async function connectDevice() {
-            console.log('Connect button clicked - starting WebUSB connection...');
+            console.log('Connect button clicked - starting Web Serial connection...');
             
-            // Check WebUSB support
-            if (!navigator.usb) {
-                statusDisplay.textContent = 'WebUSB not supported in this browser';
-                console.error('WebUSB not supported');
+            // Check Web Serial support
+            if (!navigator.serial) {
+                statusDisplay.textContent = 'Web Serial not supported in this browser';
+                console.error('Web Serial not supported');
                 return;
             }
             
-            console.log('WebUSB supported, attempting device request...');
+            console.log('Web Serial supported, attempting device request...');
             
             try {
-                console.log('Calling navigator.usb.requestDevice...');
+                console.log('Calling navigator.serial.requestPort...');
                 
-                // Filter to show only RP2040/HIDtaiko devices
-                const device = await navigator.usb.requestDevice({
+                // Filter for RP2040 devices (like Japanese interface)
+                const port = await navigator.serial.requestPort({
                     filters: [
-                        { vendorId: 0x2E8A }, // Raspberry Pi Foundation (RP2040)
-                        { vendorId: 0x239A }, // Adafruit RP2040
-                        { productName: 'rp2040 connector' }, // Your specific device
-                        { manufacturerName: 'Integrated Technology Express, Inc.' } // Your device manufacturer
+                        { usbVendorId: 0x2E8A }, // Raspberry Pi Foundation (RP2040)
+                        { usbVendorId: 0x239A }  // Adafruit RP2040
                     ]
                 });
                 
-                console.log('Device selected:', device);
-                console.log('Device info:', {
-                    productName: device.productName,
-                    manufacturerName: device.manufacturerName,
-                    vendorId: device.vendorId,
-                    productId: device.productId
+                console.log('Device selected:', port.getInfo());
+                
+                // Open serial connection with RP2040 settings
+                await port.open({
+                    baudRate: 115200,
+                    dataBits: 8,
+                    stopBits: 1,
+                    parity: 'none',
+                    flowControl: 'none'
                 });
                 
-                await device.open();
-                console.log('Device opened successfully');
+                // Set up writer for sending commands
+                writer = port.writable.getWriter();
                 
-                if (device.configuration === null) {
-                    await device.selectConfiguration(1);
-                    console.log('Configuration selected');
-                }
+                // Set up reader for receiving data
+                const decoder = new TextDecoderStream();
+                port.readable.pipeTo(decoder.writable);
+                reader = decoder.readable.getReader();
                 
-                await device.claimInterface(0);
-                console.log('Interface claimed');
-                
-                port = device;
+                // Store port reference
+                port = port;
                 isConnected = true;
                 
-                statusDisplay.textContent = `Connected to ${device.productName || 'HIDtaiko RP2040'}`;
+                statusDisplay.textContent = 'Connected to HIDtaiko RP2040 (Serial)';
                 statusDisplay.className = 'status connected';
                 
                 connectBtn.disabled = true;
@@ -669,7 +668,7 @@
                 // Start listening for data
                 readLoop();
                 
-                console.log('HIDtaiko connected successfully!');
+                console.log('HIDtaiko connected successfully via Serial!');
                 
             } catch (error) {
                 console.error('Connection failed:', error);
@@ -678,15 +677,15 @@
                 
                 let errorMessage = 'Connection failed';
                 if (error.name === 'NotFoundError') {
-                    errorMessage = 'No HIDtaiko device selected. Please select your rp2040 connector.';
+                    errorMessage = 'No HIDtaiko device selected. Please select your HIDtaiko device.';
                 } else if (error.name === 'NetworkError') {
                     errorMessage = 'Device connection failed - try different USB port';
                 } else if (error.name === 'InvalidStateError') {
                     errorMessage = 'Device already in use by another application';
                 } else if (error.name === 'NotSupportedError') {
-                    errorMessage = 'WebUSB not supported - use Chrome 89+ or Edge 89+';
+                    errorMessage = 'Web Serial not supported - use Chrome 89+ or Edge 89+';
                 } else if (error.name === 'SecurityError') {
-                    errorMessage = 'WebUSB blocked - must be triggered by user click';
+                    errorMessage = 'Connection blocked - must be triggered by user click';
                 } else {
                     errorMessage = `Connection failed: ${error.message}`;
                 }
@@ -701,18 +700,36 @@
             
             isConnected = false;
             
-            // Close WebUSB device
+            // Close reader
+            if (reader) {
+                try {
+                    await reader.cancel();
+                    reader.releaseLock();
+                } catch (error) {
+                    console.error('Reader close error:', error);
+                }
+                reader = null;
+            }
+            
+            // Close writer
+            if (writer) {
+                try {
+                    writer.releaseLock();
+                } catch (error) {
+                    console.error('Writer close error:', error);
+                }
+                writer = null;
+            }
+            
+            // Close port
             if (port) {
                 try {
                     await port.close();
                 } catch (error) {
-                    console.error('Device close error:', error);
+                    console.error('Port close error:', error);
                 }
                 port = null;
             }
-            
-            writer = null;
-            reader = null;
             
             statusDisplay.textContent = 'Disconnected';
             statusDisplay.className = 'status';
@@ -842,13 +859,13 @@
             saveBtn.addEventListener('click', saveToMemory);
         }
 
-        // Check for WebUSB support
-        if (!navigator.usb) {
-            statusDisplay.textContent = 'WebUSB not supported. Use Chrome 89+ or Edge 89+.';
+        // Check for Web Serial API support
+        if (!navigator.serial) {
+            statusDisplay.textContent = 'Web Serial not supported. Use Chrome 89+ or Edge 89+.';
             statusDisplay.className = 'status';
             connectBtn.disabled = true;
         } else {
-            statusDisplay.textContent = 'Ready to connect (WebUSB API)';
+            statusDisplay.textContent = 'Ready to connect (Web Serial API)';
             statusDisplay.className = 'status';
         }
     </script>
