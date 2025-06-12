@@ -16,13 +16,11 @@
             min-height: 100vh;
             color: #333;
         }
-
         @keyframes tiedye {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -32,25 +30,21 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
         }
-
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
-
         .header h1 {
             color: #4a5568;
             font-size: 2.5em;
             margin: 0;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
-
         .header .subtitle {
             color: #718096;
             font-size: 1.1em;
             margin-top: 10px;
         }
-
         .status-info {
             background: #f7fafc;
             border-radius: 8px;
@@ -59,7 +53,6 @@
             text-align: center;
             border-left: 5px solid #4299e1;
         }
-
         .connection-panel {
             background: #f7fafc;
             border-radius: 10px;
@@ -67,7 +60,6 @@
             margin-bottom: 30px;
             border-left: 5px solid #4299e1;
         }
-
         .button-row {
             display: flex;
             gap: 12px;
@@ -75,7 +67,6 @@
             justify-content: center;
             margin-bottom: 15px;
         }
-
         .btn {
             background: linear-gradient(135deg, #4299e1, #3182ce);
             color: white;
@@ -88,21 +79,24 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
         }
-
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 18px rgba(66, 153, 225, 0.4);
         }
-
         .btn.save {
             background: linear-gradient(135deg, #48bb78, #38a169);
             box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
         }
-
         .btn.save:hover {
             box-shadow: 0 6px 18px rgba(72, 187, 120, 0.4);
         }
-
+        .btn.default {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+        }
+        .btn.default:hover {
+            box-shadow: 0 6px 18px rgba(237, 137, 54, 0.4);
+        }
         .btn:disabled {
             background: #cbd5e0;
             color: #a0aec0;
@@ -110,12 +104,10 @@
             box-shadow: none;
             opacity: 0.4;
         }
-
         .btn:disabled:hover {
             transform: none;
             box-shadow: none;
         }
-
         .status {
             padding: 12px 20px;
             border-radius: 6px;
@@ -126,16 +118,13 @@
             text-align: center;
             width: 100%;
         }
-
         .status.connected {
             background: #c6f6d5;
             color: #22543d;
         }
-
         .section {
             margin-bottom: 30px;
         }
-
         .section-title {
             font-size: 1.3em;
             font-weight: 600;
@@ -144,14 +133,12 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #e2e8f0;
         }
-
         .drum-row {
             display: flex;
             gap: 15px;
             margin-bottom: 30px;
             flex-wrap: wrap;
         }
-
         .slider-container {
             background: white;
             border-radius: 10px;
@@ -161,53 +148,43 @@
             border-left: 4px solid #4299e1;
             transition: all 0.3s ease;
         }
-
         .slider-container.surface {
             border-left: 4px solid #e53e3e;
         }
-
         .slider-container.surface .slider-value {
             background: #e53e3e;
         }
-
         .slider-container.surface input[type="range"]::-webkit-slider-thumb {
             background: linear-gradient(135deg, #e53e3e, #c53030);
         }
-
         .slider-container.surface input[type="range"]::-moz-range-thumb {
             background: linear-gradient(135deg, #e53e3e, #c53030);
         }
-
         .slider-container.compact {
             flex: 1;
             padding: 15px;
             min-width: 200px;
         }
-
         .slider-container:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             transform: translateY(-1px);
         }
-
         .slider-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
         }
-
         .slider-label {
             font-weight: 600;
             color: #2d3748;
             font-size: 1.1em;
         }
-
         .drum-label {
             font-size: 0.9em;
             color: #718096;
             font-style: italic;
         }
-
         .slider-value {
             background: #4299e1;
             color: white;
@@ -217,7 +194,6 @@
             min-width: 40px;
             text-align: center;
         }
-
         .slider-description {
             font-size: 10px;
             color: #666;
@@ -227,12 +203,10 @@
             font-style: italic;
             padding: 0 4px;
         }
-
         .slider-container:hover .slider-description {
             opacity: 1;
             color: #444;
         }
-
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
@@ -243,7 +217,6 @@
             outline: none;
             cursor: pointer;
         }
-
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -255,12 +228,10 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             transition: all 0.2s ease;
         }
-
         input[type="range"]::-webkit-slider-thumb:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
         }
-
         input[type="range"]::-moz-range-thumb {
             height: 24px;
             width: 24px;
@@ -270,7 +241,6 @@
             border: none;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-
         .instructions {
             background: #edf2f7;
             border-radius: 10px;
@@ -278,24 +248,20 @@
             margin-top: 30px;
             border-left: 5px solid #38a169;
         }
-
         .instructions h2 {
             color: #2d3748;
             margin-top: 0;
             margin-bottom: 20px;
         }
-
         .instructions ol {
             margin: 0;
             padding-left: 20px;
         }
-
         .instructions li {
             margin-bottom: 10px;
             color: #4a5568;
             line-height: 1.6;
         }
-
         .parameter-help {
             background: #f0fff4;
             border-radius: 10px;
@@ -303,25 +269,21 @@
             margin-top: 20px;
             border-left: 5px solid #68d391;
         }
-
         .parameter-help h3 {
             color: #22543d;
             margin-top: 0;
         }
-
         .parameter-item {
             margin-bottom: 15px;
             padding: 10px;
             background: white;
             border-radius: 6px;
         }
-
         .parameter-item strong {
             color: #2d3748;
             display: block;
             margin-bottom: 5px;
         }
-
         .footer {
             text-align: center;
             margin-top: 40px;
@@ -330,33 +292,29 @@
             border-radius: 10px;
             border: 2px solid #e2e8f0;
         }
-
         .footer a {
             color: #4299e1;
             text-decoration: none;
             font-weight: 600;
         }
-
         .footer a:hover {
             text-decoration: underline;
         }
-
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
                 padding: 20px;
             }
-            
+
             .header h1 {
                 font-size: 2em;
             }
-            
+
             .button-row {
                 flex-direction: column;
                 align-items: stretch;
                 gap: 10px;
             }
-
             .drum-row {
                 flex-direction: column;
             }
@@ -369,16 +327,16 @@
             <h1>HIDtaiko RP2040 Controller</h1>
             <div class="subtitle">English Interface - Real-time Sensitivity & Timing Configuration</div>
         </div>
-
+        
         <div class="status-info">
             <span id="status" class="status">No device connected</span>
         </div>
-
+        
         <div class="connection-panel">
             <div class="button-row">
                 <button id="connect" class="btn">Connect</button>
                 <button id="disconnect" class="btn" disabled>Disconnect</button>
-                <button id="defaultValues" class="btn" disabled>Default Values</button>
+                <button id="defaultValues" class="btn default" disabled>Default Values</button>
                 <button id="saveToDevice" class="btn save" disabled>Save To Device</button>
                 <button id="requestValues" class="btn" disabled>Request Loaded Values</button>
             </div>
@@ -386,7 +344,7 @@
 
         <div class="section">
             <h2 class="section-title">Drum Pad Sensitivity (Lower = More Sensitive)</h2>
-            
+
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
@@ -438,7 +396,7 @@
 
         <div class="section">
             <h2 class="section-title">Input Delay Timers (milliseconds)</h2>
-            
+
             <div class="slider-container">
                 <div class="slider-header">
                     <div>
@@ -504,41 +462,42 @@
             <h2>Setup Instructions</h2>
             <ol>
                 <li><strong>Click "Connect"</strong> and select your HIDtaiko device (Chrome/Edge browser required)</li>
-                <li><strong>Click "Request Settings"</strong> to load current values from controller</li>
-                <li><strong>Adjust sliders</strong> - Changes are sent in real-time</li>
-                <li><strong>Use "Send Settings"</strong> to manually update controller if needed</li>
+                <li><strong>Click "Default Values"</strong> to load recommended starting values</li>
+                <li><strong>Adjust sliders</strong> to tune sensitivity and timing</li>
+                <li><strong>Click "Save To Device"</strong> to save settings permanently</li>
+                <li><strong>Use "Request Loaded Values"</strong> to reload saved settings from device</li>
             </ol>
             <p><em>Note: Sensitivity values are thresholds - lower numbers = higher sensitivity</em></p>
         </div>
 
         <div class="parameter-help">
             <h3>Parameter Guide</h3>
-            
+
             <div class="parameter-item">
                 <strong>Sensitivity:</strong>
                 Threshold values for piezo sensors. When sensor voltage exceeds this value, a key press is triggered. Lower values = more sensitive.
             </div>
-            
+
             <div class="parameter-item">
                 <strong>Delay Setting #1:</strong>
                 Prevents the same pad from triggering multiple times rapidly. Increase if you get unwanted double-hits on the same pad.
             </div>
-            
+
             <div class="parameter-item">
                 <strong>Delay Setting #2:</strong>
                 Lockout time for surface pads after any pad is hit. Prevents multiple surface hits but don't set too high or rapid surface hits won't register.
             </div>
-            
+
             <div class="parameter-item">
                 <strong>Delay Setting #3:</strong>
                 Lockout time for rim pads after any pad is hit. Similar to Delay Setting #2 but for rim pads.
             </div>
-            
+
             <div class="parameter-item">
                 <strong>Delay Setting #4:</strong>
                 Cross-lockout between surface and rim pads. Prevents rim from triggering when surface is hit and vice versa.
             </div>
-            
+
             <div class="parameter-item">
                 <strong>Delay Setting #5:</strong>
                 Special timing adjustment for certain rhythm games. Use 0 for most games, try 20 if controller works in text editors but not in games.
@@ -553,7 +512,7 @@
     </div>
 
     <script>
-        // Global variables (make sure these are let, not const)
+        // Global variables
         let port = null;
         let writer = null;
         let reader = null;
@@ -567,17 +526,17 @@
         const requestValuesBtn = document.getElementById('requestValues');
         const statusDisplay = document.getElementById('status');
 
-        // Slider mappings to match original Japanese interface
+        // Slider mappings
         const sliders = {
-            dx0: document.getElementById('dx0'),
-            dx1: document.getElementById('dx1'),
-            dx2: document.getElementById('dx2'),
-            dx3: document.getElementById('dx3'),
-            dx4: document.getElementById('dx4'),
-            dx5: document.getElementById('dx5'),
-            dx6: document.getElementById('dx6'),
-            dx7: document.getElementById('dx7'),
-            dx8: document.getElementById('dx8')
+            dx0: document.getElementById('dx0'),   // A0 Right Rim
+            dx1: document.getElementById('dx1'),   // A1 Right Surface  
+            dx2: document.getElementById('dx2'),   // A2 Left Surface
+            dx3: document.getElementById('dx3'),   // A3 Left Rim
+            dx4: document.getElementById('dx4'),   // B-delay
+            dx5: document.getElementById('dx5'),   // C-delay
+            dx6: document.getElementById('dx6'),   // D-delay
+            dx7: document.getElementById('dx7'),   // H-delay
+            dx8: document.getElementById('dx8')    // A-delay
         };
 
         const valueDisplays = {
@@ -605,80 +564,82 @@
                 const key = Object.keys(sliders).find(k => sliders[k] === this);
                 valueDisplays[key].textContent = this.value;
                 updateSliderBackground(this);
+                
+                // Send values in real-time when connected
                 if (isConnected) {
                     sendCurrentValues();
                 }
             });
         });
 
-        // Web Serial API Connection
+        // Button Functions
         async function connectDevice() {
             console.log('Connect button clicked - starting Web Serial connection...');
-            
+
             if (!navigator.serial) {
                 statusDisplay.textContent = 'Web Serial not supported in this browser';
                 console.error('Web Serial not supported');
                 return;
             }
-            
+
             try {
                 const serialPort = await navigator.serial.requestPort({
-                    filters: []
+                    filters: [] // Empty filters = show all devices
                 });
-                
-                console.log('Device selected, attempting to open...');
-                
-                // Try with more flexible settings
+
+                console.log('Device selected:', serialPort.getInfo());
+
                 await serialPort.open({
-                    baudRate: 9600,  // Try slower rate first
+                    baudRate: 115200,
                     dataBits: 8,
                     stopBits: 1,
                     parity: 'none',
-                    flowControl: 'none',
-                    bufferSize: 255
+                    flowControl: 'none'
                 });
-                
-                console.log('Serial port opened successfully!');
-                
+
                 writer = serialPort.writable.getWriter();
-                
                 const decoder = new TextDecoderStream();
                 serialPort.readable.pipeTo(decoder.writable);
                 reader = decoder.readable.getReader();
-                
-                // Fix: Don't reassign port, just update the global variables
+
                 port = serialPort;
                 isConnected = true;
-                
+
                 statusDisplay.textContent = 'Connected to HIDtaiko RP2040 (Serial)';
                 statusDisplay.className = 'status connected';
-                
+
                 connectBtn.disabled = true;
                 disconnectBtn.disabled = false;
                 defaultValuesBtn.disabled = false;
                 saveToDeviceBtn.disabled = false;
                 requestValuesBtn.disabled = false;
-                
+
                 readLoop();
-                
                 console.log('HIDtaiko connected successfully via Serial!');
-                
+
             } catch (error) {
                 console.error('Connection failed:', error);
                 let errorMessage = 'Connection failed';
+                
                 if (error.name === 'NotFoundError') {
                     errorMessage = 'No HIDtaiko device selected. Please select your HIDtaiko device.';
+                } else if (error.name === 'NetworkError') {
+                    errorMessage = 'Device connection failed - try different USB port';
+                } else if (error.name === 'InvalidStateError') {
+                    errorMessage = 'Device already in use by another application';
                 } else {
                     errorMessage = `Connection failed: ${error.message}`;
                 }
+
                 statusDisplay.textContent = errorMessage;
                 statusDisplay.className = 'status';
             }
         }
 
         async function disconnectDevice() {
+            console.log('Disconnecting from HIDtaiko device...');
             isConnected = false;
-            
+
             if (reader) {
                 try {
                     await reader.cancel();
@@ -688,7 +649,7 @@
                 }
                 reader = null;
             }
-            
+
             if (writer) {
                 try {
                     writer.releaseLock();
@@ -697,7 +658,7 @@
                 }
                 writer = null;
             }
-            
+
             if (port) {
                 try {
                     await port.close();
@@ -706,151 +667,57 @@
                 }
                 port = null;
             }
-            
+
             statusDisplay.textContent = 'Disconnected';
             statusDisplay.className = 'status';
-            
+
             connectBtn.disabled = false;
             disconnectBtn.disabled = true;
             defaultValuesBtn.disabled = true;
             saveToDeviceBtn.disabled = true;
             requestValuesBtn.disabled = true;
+
+            console.log('HIDtaiko device disconnected');
         }
 
-        async function readLoop() {
-            if (!port || !isConnected || !reader) return;
+        // Load default values (offline function - just updates sliders)
+        function loadDefaultValues() {
+            console.log('Loading default values...');
             
-            try {
-                while (isConnected && reader) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    
-                    if (value && value.trim()) {
-                        console.log('Raw data received:', value);
-                        console.log('Data length:', value.length);
-                        console.log('Data as bytes:', Array.from(new TextEncoder().encode(value)));
-                        
-                        // Try to parse as response
-                        parseReceivedData(value);
-                        
-                        // Also try parsing as individual characters/numbers
-                        const chars = value.split('');
-                        console.log('Individual characters:', chars);
-                        
-                        // Look for numeric patterns
-                        const numbers = value.match(/\d+/g);
-                        if (numbers) {
-                            console.log('Found numbers in response:', numbers);
-                        }
-                    }
-                }
-            } catch (error) {
-                if (isConnected) {
-                    console.error('Read error:', error);
-                }
-            }
-        }
+            // Default values for HIDtaiko
+            const defaults = {
+                dx0: 80,    // A0 Right Rim
+                dx1: 130,   // A1 Right Surface
+                dx2: 130,   // A2 Left Surface
+                dx3: 80,    // A3 Left Rim
+                dx4: 10,    // B-delay
+                dx5: 30,    // C-delay
+                dx6: 32,    // D-delay
+                dx7: 0,     // H-delay
+                dx8: 1      // A-delay
+            };
 
-        function parseReceivedData(data) {
-            console.log('=== PARSING RECEIVED DATA ===');
-            console.log('Type:', typeof data);
-            console.log('Content:', data);
-            console.log('Length:', data.length);
-            
-            try {
-                // Method 1: Try parsing as newline-separated values
-                const lines = data.trim().split('\n');
-                console.log('Split by newlines:', lines);
-                
-                const values = [];
-                lines.forEach((line, index) => {
-                    const trimmed = line.trim();
-                    console.log(`Line ${index}: "${trimmed}"`);
-                    if (trimmed && !isNaN(trimmed)) {
-                        values.push(parseInt(trimmed));
-                    }
-                });
-                
-                console.log('Extracted numeric values:', values);
-                
-                // Method 2: Try parsing as space-separated values
-                const spaceValues = data.trim().split(/\s+/).map(v => parseInt(v.trim())).filter(v => !isNaN(v));
-                console.log('Space-separated values:', spaceValues);
-                
-                // Method 3: Try parsing as comma-separated values
-                const commaValues = data.trim().split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
-                console.log('Comma-separated values:', commaValues);
-                
-                // Use whichever method gave us 9 values
-                let finalValues = [];
-                if (values.length >= 9) finalValues = values;
-                else if (spaceValues.length >= 9) finalValues = spaceValues;
-                else if (commaValues.length >= 9) finalValues = commaValues;
-                
-                console.log('Final values to use:', finalValues);
-                
-                if (finalValues.length >= 9) {
-                    console.log('SUCCESS: Found 9+ values, updating sliders');
-                    updateSlidersWithValues(finalValues);
-                } else {
-                    console.log(`Only found ${finalValues.length} values, need at least 9`);
-                    statusDisplay.textContent = `Received ${finalValues.length} values, need 9 for complete settings`;
-                }
-                
-            } catch (error) {
-                console.error('Parse error:', error);
-            }
-        }
-        
-        function updateSlidersWithValues(values) {
-            console.log('Updating sliders with values:', values);
-            
-            // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
-            const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
-            
-            values.slice(0, 9).forEach((value, index) => {
-                if (mapping[index] && sliders[mapping[index]]) {
-                    console.log(`Setting ${mapping[index]} to ${value}`);
-                    sliders[mapping[index]].value = value;
-                    valueDisplays[mapping[index]].textContent = value;
-                    updateSliderBackground(sliders[mapping[index]]);
+            // Update all sliders and displays
+            Object.keys(defaults).forEach(key => {
+                if (sliders[key]) {
+                    sliders[key].value = defaults[key];
+                    valueDisplays[key].textContent = defaults[key];
+                    updateSliderBackground(sliders[key]);
                 }
             });
-            
-            statusDisplay.textContent = 'Settings loaded from device successfully!';
-            statusDisplay.className = 'status connected';
+
+            console.log('Default values loaded:', defaults);
         }
 
-        // Sensitivity Transmission function (matches Japanese interface)
-        async function sensitivityTransmission() {
-            if (!port || !isConnected || !writer) return;
-            
-            try {
-                console.log('Sensitivity Transmission (like Japanese interface)...');
-                
-                // This might be the actual transmission command
-                const transmissionCommand = new Uint8Array([252]); // Different command
-                
-                await writer.write(transmissionCommand);
-                console.log('Sensitivity transmission command sent');
-                statusDisplay.textContent = 'Sensitivity transmitted to connector';
-                
-            } catch (error) {
-                console.error('Transmission error:', error);
-                statusDisplay.textContent = 'Transmission failed: ' + error.message;
-            }
-        }
-        // Send Sensitivity function (matches Japanese interface)  
+        // Send current slider values to device
         async function sendCurrentValues() {
-            if (!port || !isConnected || !writer) return;
-            
+            if (!writer || !isConnected) return;
+
             try {
-                console.log('Send Sensitivity (like Japanese interface)...');
-                
-                // Send as binary data like the original Japanese interface
-                const values = new Uint8Array([
+                // Send values in the order expected by HIDtaiko firmware
+                const data = new Uint8Array([
                     parseInt(sliders.dx1.value), // A1 - Right Surface
-                    parseInt(sliders.dx0.value), // A0 - Right Rim  
+                    parseInt(sliders.dx0.value), // A0 - Right Rim
                     parseInt(sliders.dx2.value), // A2 - Left Surface
                     parseInt(sliders.dx3.value), // A3 - Left Rim
                     parseInt(sliders.dx4.value), // B-delay
@@ -859,72 +726,137 @@
                     parseInt(sliders.dx7.value), // H-delay
                     parseInt(sliders.dx8.value)  // A-delay
                 ]);
-                
-                console.log('Sending sensitivity values:', Array.from(values));
-                
-                // Send as raw binary data
-                await writer.write(values);
-                
-                console.log('Sensitivity values sent successfully');
-                statusDisplay.textContent = 'Default sensitivity written to device';
-                
+
+                await writer.write(data);
+                console.log('Sending values:', Array.from(data));
+
             } catch (error) {
-                console.error('Send sensitivity error:', error);
+                console.error('Send error:', error);
                 statusDisplay.textContent = 'Send failed: ' + error.message;
             }
         }
 
-        // Request Sensitivity function (matches Japanese interface)
-        async function requestValues() {
-            if (!port || !isConnected || !writer) return;
-            
+        // Save to device (send values + save command)
+        async function saveToDevice() {
+            if (!writer || !isConnected) return;
+
             try {
-                console.log('Request Sensitivity (like Japanese interface)...');
+                console.log('Saving to device...');
                 
-                // Try the exact command the Japanese interface uses
-                const requestCommand = new Uint8Array([255]); // Standard request command
+                // First send current values
+                await sendCurrentValues();
                 
-                await writer.write(requestCommand);
-                console.log('Request sensitivity command sent');
-                statusDisplay.textContent = 'Reading sensitivity from device...';
+                // Wait a moment
+                await new Promise(r => setTimeout(r, 100));
                 
+                // Send save command
+                const saveCommand = new Uint8Array([254]); // Save command
+                await writer.write(saveCommand);
+                
+                console.log('Save command sent');
+                
+                // Visual feedback
+                const originalText = saveToDeviceBtn.textContent;
+                saveToDeviceBtn.textContent = 'Saved!';
+                saveToDeviceBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+                
+                setTimeout(() => {
+                    saveToDeviceBtn.textContent = originalText;
+                    saveToDeviceBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
+                }, 2000);
+
             } catch (error) {
-                console.error('Request sensitivity error:', error);
+                console.error('Save error:', error);
+                statusDisplay.textContent = 'Save failed: ' + error.message;
+            }
+        }
+
+        // Request values from device
+        async function requestValues() {
+            if (!writer || !isConnected) return;
+
+            try {
+                console.log('Requesting values from device...');
+                
+                // Send request command
+                const requestCommand = new Uint8Array([255]); // Request command
+                await writer.write(requestCommand);
+                
+                console.log('Request command sent, waiting for response...');
+
+            } catch (error) {
+                console.error('Request error:', error);
                 statusDisplay.textContent = 'Request failed: ' + error.message;
             }
         }
 
-        async function saveToMemory() {
-            if (!port || !isConnected || !writer) return;
-            
+        // Read data loop
+        async function readLoop() {
+            if (!isConnected) return;
+
             try {
-                console.log('Saving settings to device memory...');
-                
-                // Send save command (254 is commonly used for save)
-                const saveCommand = new Uint8Array([254]);
-                
-                await writer.write(saveCommand);
-                console.log('Save command sent');
-                
-                statusDisplay.textContent = 'Settings saved to device memory!';
-                statusDisplay.className = 'status connected';
-                
-                // Visual feedback on save button
-                const saveBtn = document.getElementById('saveButton');
-                if (saveBtn) {
-                    const originalText = saveBtn.textContent;
-                    saveBtn.textContent = 'Saved!';
-                    saveBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+                while (isConnected) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    console.log('=== RAW DATA RECEIVED ===');
+                    console.log('Raw data:', value);
+                    console.log('Data length:', value.length);
                     
-                    setTimeout(() => {
-                        saveBtn.textContent = originalText;
-                        saveBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
-                    }, 2000);
+                    // Try to parse the received data
+                    parseReceivedData(value);
+                }
+            } catch (error) {
+                console.error('Read loop error:', error);
+                if (isConnected) {
+                    setTimeout(readLoop, 1000); // Retry after 1 second
+                }
+            }
+        }
+
+        // Parse received data from device
+        function parseReceivedData(data) {
+            try {
+                console.log('=== PARSING RECEIVED DATA ===');
+                console.log('Data to parse:', data);
+                
+                // Split by various delimiters and clean up
+                const lines = data.split(/[\n\r\s,]+/).filter(line => line.trim().length > 0);
+                console.log('Split by newlines/spaces:', lines);
+                
+                // Extract numeric values
+                const values = [];
+                lines.forEach(line => {
+                    const cleaned = line.trim();
+                    const num = parseInt(cleaned);
+                    if (!isNaN(num) && num >= 0 && num <= 500) { // Reasonable range check
+                        values.push(num);
+                    }
+                });
+                
+                console.log('Extracted numeric values:', values);
+                
+                if (values.length >= 9) {
+                    // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A]
+                    const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
+                    
+                    values.forEach((value, index) => {
+                        if (mapping[index] && sliders[mapping[index]]) {
+                            sliders[mapping[index]].value = value;
+                            valueDisplays[mapping[index]].textContent = value;
+                            updateSliderBackground(sliders[mapping[index]]);
+                        }
+                    });
+                    
+                    console.log('✅ Successfully updated sliders with received values!');
+                    statusDisplay.textContent = 'Settings loaded from device';
+                    statusDisplay.className = 'status connected';
+                } else {
+                    console.log('⚠️ Not enough values received:', values.length, 'expected 9');
                 }
                 
             } catch (error) {
-                console.error('Save error:', error);
-                statusDisplay.textContent = 'Save failed: ' + error.message;
+                console.error('Parse error:', error);
             }
         }
 
@@ -932,10 +864,10 @@
         connectBtn.addEventListener('click', connectDevice);
         disconnectBtn.addEventListener('click', disconnectDevice);
         defaultValuesBtn.addEventListener('click', loadDefaultValues);
-        saveToDeviceBtn.addEventListener('click', saveCurrentValuesToDevice);
-        requestValuesBtn.addEventListener('click', requestLoadedValues);
+        saveToDeviceBtn.addEventListener('click', saveToDevice);
+        requestValuesBtn.addEventListener('click', requestValues);
 
-        // Check for Web Serial API support
+        // Check for Web Serial API support on page load
         if (!navigator.serial) {
             statusDisplay.textContent = 'Web Serial not supported. Use Chrome 89+ or Edge 89+.';
             statusDisplay.className = 'status';
@@ -944,6 +876,8 @@
             statusDisplay.textContent = 'Ready to connect (Web Serial API)';
             statusDisplay.className = 'status';
         }
+
+        console.log('HIDtaiko interface loaded successfully!');
     </script>
 </body>
 </html>
