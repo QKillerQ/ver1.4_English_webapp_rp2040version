@@ -248,6 +248,14 @@
             <button id="requestValues" class="btn" disabled>Load Last Settings</button>
         </div>
 
+        <!-- SETTINGS BACKUP/RESTORE -->
+        <div style="text-align: center; margin: 15px 0; padding: 15px; background: #f0f8ff; border-radius: 8px; border: 1px solid #bee3f8;">
+            <p style="margin: 0 0 10px 0; color: #2c5282; font-weight: 600;">💾 Settings Backup & Restore</p>
+            <button id="exportSettings" class="btn" style="background: linear-gradient(135deg, #805ad5, #6b46c1);" disabled>Export Settings</button>
+            <button id="importSettings" class="btn" style="background: linear-gradient(135deg, #38a169, #2f855a);" disabled>Import Settings</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;">
+        </div>
+
         <div class="slider-container">
             <div class="slider-header">
                 <div>
@@ -446,6 +454,9 @@
         const defaultValuesBtn = document.getElementById('defaultValues');
         const saveToDeviceBtn = document.getElementById('saveToDevice');
         const requestValuesBtn = document.getElementById('requestValues');
+        const exportBtn = document.getElementById('exportSettings');
+        const importBtn = document.getElementById('importSettings');
+        const importFile = document.getElementById('importFile');
         const statusDisplay = document.getElementById('status');
 
         // Sliders
@@ -535,6 +546,8 @@
                 defaultValuesBtn.disabled = false;
                 saveToDeviceBtn.disabled = false;
                 requestValuesBtn.disabled = false;
+                exportBtn.disabled = false;
+                importBtn.disabled = false;
 
                 console.log('✅ Connected successfully!');
                 
@@ -589,6 +602,8 @@
             defaultValuesBtn.disabled = true;
             saveToDeviceBtn.disabled = true;
             requestValuesBtn.disabled = true;
+            exportBtn.disabled = true;
+            importBtn.disabled = true;
 
             console.log('✅ Disconnected');
         }
@@ -761,7 +776,104 @@
             }
         }
 
-        // Request values from device (enhanced with local fallback)
+        // Export settings to file
+        function exportSettings() {
+            const currentSettings = {
+                dx0: parseInt(sliders.dx0.value),
+                dx1: parseInt(sliders.dx1.value),
+                dx2: parseInt(sliders.dx2.value),
+                dx3: parseInt(sliders.dx3.value),
+                dx4: parseInt(sliders.dx4.value),
+                dx5: parseInt(sliders.dx5.value),
+                dx6: parseInt(sliders.dx6.value),
+                dx7: parseInt(sliders.dx7.value),
+                dx8: parseInt(sliders.dx8.value),
+                timestamp: new Date().toISOString(),
+                version: "1.0"
+            };
+
+            try {
+                const dataStr = JSON.stringify(currentSettings, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `hidtaiko-settings-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                console.log('📁 Settings exported to file');
+                
+                // Visual feedback
+                const originalText = exportBtn.textContent;
+                exportBtn.textContent = 'Exported!';
+                exportBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+                
+                setTimeout(() => {
+                    exportBtn.textContent = originalText;
+                    exportBtn.style.background = 'linear-gradient(135deg, #805ad5, #6b46c1)';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Export failed:', error);
+                alert('Export failed: ' + error.message);
+            }
+        }
+
+        // Import settings from file
+        function importSettings() {
+            importFile.click();
+        }
+
+        // Handle file import
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const settings = JSON.parse(e.target.result);
+                    
+                    // Validate and load settings
+                    if (settings && typeof settings === 'object') {
+                        Object.keys(settings).forEach(key => {
+                            if (sliders[key] && typeof settings[key] === 'number') {
+                                sliders[key].value = settings[key];
+                                valueDisplays[key].textContent = settings[key];
+                            }
+                        });
+                        
+                        // Also save to memory and try localStorage
+                        window.hidtaikoSettings = settings;
+                        saveSettingsLocally();
+                        
+                        console.log('📁 Settings imported from file:', settings);
+                        statusDisplay.textContent = `Settings imported from ${file.name}`;
+                        
+                        // Visual feedback
+                        const originalText = importBtn.textContent;
+                        importBtn.textContent = 'Imported!';
+                        importBtn.style.background = 'linear-gradient(135deg, #4299e1, #3182ce)';
+                        
+                        setTimeout(() => {
+                            importBtn.textContent = originalText;
+                            importBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+                        }, 2000);
+                        
+                    } else {
+                        throw new Error('Invalid settings file format');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Import failed:', error);
+                    alert('Import failed: ' + error.message + '\n\nPlease select a valid HIDtaiko settings file.');
+                }
+            };
+            
+            reader.readAsText(file);
+            // Clear the file input for next use
+            event.target.value = '';
+        }
         async function requestValues() {
             if (!isConnected) {
                 // If not connected, try to load from local storage
@@ -867,6 +979,9 @@
         defaultValuesBtn.addEventListener('click', loadDefaultValues);
         saveToDeviceBtn.addEventListener('click', saveToDevice);
         requestValuesBtn.addEventListener('click', requestValues);
+        exportBtn.addEventListener('click', exportSettings);
+        importBtn.addEventListener('click', importSettings);
+        importFile.addEventListener('change', handleFileImport);
 
         console.log('🚀 HIDtaiko interface loaded successfully!');
     </script>
