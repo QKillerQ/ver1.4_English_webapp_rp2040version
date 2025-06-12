@@ -688,15 +688,16 @@
                 deviceInfo: port ? port.getInfo() : null
             };
             
-            // Store in both memory and browser session storage for persistence
+            // Store in both memory and browser local storage for true persistence
             window.hidtaikoSettings = currentSettings;
             
             try {
-                // Also store in sessionStorage for persistence across connections
-                sessionStorage.setItem('hidtaikoSettings', JSON.stringify(currentSettings));
-                console.log('💾 Settings saved locally and to session storage:', currentSettings);
+                // Use localStorage for persistence across browser restarts
+                localStorage.setItem('hidtaikoSettings', JSON.stringify(currentSettings));
+                console.log('💾 Settings saved locally and to local storage:', currentSettings);
             } catch (e) {
-                // Fallback to memory only if sessionStorage not available
+                console.log('⚠️ localStorage not available, using memory only:', e);
+                // Fallback to memory only if localStorage not available
                 console.log('💾 Settings saved to memory only:', currentSettings);
             }
         }
@@ -705,18 +706,31 @@
         function loadSavedSettings() {
             let settings = null;
             
-            // Try to load from sessionStorage first
+            // Try to load from localStorage first (persists across browser restarts)
             try {
-                const stored = sessionStorage.getItem('hidtaikoSettings');
+                const stored = localStorage.getItem('hidtaikoSettings');
                 if (stored) {
                     settings = JSON.parse(stored);
-                    console.log('📤 Loading settings from session storage');
+                    console.log('📤 Loading settings from local storage (persistent)');
                 }
             } catch (e) {
-                console.log('⚠️ Could not access session storage');
+                console.log('⚠️ Could not access local storage:', e);
             }
             
-            // Fallback to memory storage
+            // Fallback to sessionStorage
+            if (!settings) {
+                try {
+                    const stored = sessionStorage.getItem('hidtaikoSettings');
+                    if (stored) {
+                        settings = JSON.parse(stored);
+                        console.log('📤 Loading settings from session storage');
+                    }
+                } catch (e) {
+                    console.log('⚠️ Could not access session storage');
+                }
+            }
+            
+            // Final fallback to memory storage
             if (!settings && window.hidtaikoSettings) {
                 settings = window.hidtaikoSettings;
                 console.log('📤 Loading settings from memory');
@@ -741,7 +755,7 @@
                 
                 return true;
             } else {
-                console.log('⚠️ No saved settings found in storage or memory');
+                console.log('⚠️ No saved settings found in any storage');
                 statusDisplay.textContent = 'No saved settings found - use Default Values';
                 return false;
             }
