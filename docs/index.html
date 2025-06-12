@@ -624,13 +624,19 @@
                     filters: []
                 });
                 
+                console.log('Device selected, attempting to open...');
+                
+                // Try with more flexible settings
                 await serialPort.open({
-                    baudRate: 115200,
+                    baudRate: 9600,  // Try slower rate first
                     dataBits: 8,
                     stopBits: 1,
                     parity: 'none',
-                    flowControl: 'none'
+                    flowControl: 'none',
+                    bufferSize: 255
                 });
+                
+                console.log('Serial port opened successfully!');
                 
                 writer = serialPort.writable.getWriter();
                 
@@ -752,24 +758,33 @@
             if (!port || !isConnected || !writer) return;
             
             try {
+                // Send data in the exact format the original Japanese interface uses
                 const values = [
-                    parseInt(sliders.dx1.value),
-                    parseInt(sliders.dx0.value),
-                    parseInt(sliders.dx2.value),
-                    parseInt(sliders.dx3.value),
-                    parseInt(sliders.dx4.value),
-                    parseInt(sliders.dx5.value),
-                    parseInt(sliders.dx6.value),
-                    parseInt(sliders.dx7.value),
-                    parseInt(sliders.dx8.value)
+                    parseInt(sliders.dx1.value), // A1 - Right Surface
+                    parseInt(sliders.dx0.value), // A0 - Right Rim  
+                    parseInt(sliders.dx2.value), // A2 - Left Surface
+                    parseInt(sliders.dx3.value), // A3 - Left Rim
+                    parseInt(sliders.dx4.value), // B-delay
+                    parseInt(sliders.dx5.value), // C-delay
+                    parseInt(sliders.dx6.value), // D-delay
+                    parseInt(sliders.dx7.value), // H-delay
+                    parseInt(sliders.dx8.value)  // A-delay
                 ];
                 
-                const dataString = values.join(',') + '\n';
-                const encoder = new TextEncoder();
-                const data = encoder.encode(dataString);
+                console.log('Sending values:', values);
                 
-                await writer.write(data);
-                console.log('Sent values:', values);
+                // Try multiple formats to match original interface
+                
+                // Format 1: Line-by-line (like original)
+                for (let i = 0; i < values.length; i++) {
+                    const line = values[i].toString() + '\n';
+                    const data = new TextEncoder().encode(line);
+                    await writer.write(data);
+                    await new Promise(resolve => setTimeout(resolve, 10)); // Small delay
+                }
+                
+                console.log('Values sent successfully');
+                statusDisplay.textContent = 'Settings sent to device';
                 
             } catch (error) {
                 console.error('Send error:', error);
@@ -781,11 +796,19 @@
             if (!port || !isConnected || !writer) return;
             
             try {
-                const encoder = new TextEncoder();
-                const command = encoder.encode('REQUEST\n');
+                console.log('Requesting values from device...');
                 
-                await writer.write(command);
-                console.log('Requested current values');
+                // Try different request formats
+                const requests = ['REQUEST\n', 'GET\n', 'R\n', '\n'];
+                
+                for (const req of requests) {
+                    const data = new TextEncoder().encode(req);
+                    await writer.write(data);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                console.log('Request sent');
+                statusDisplay.textContent = 'Requested settings from device';
                 
             } catch (error) {
                 console.error('Request error:', error);
