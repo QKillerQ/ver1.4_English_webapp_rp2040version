@@ -680,36 +680,18 @@ async function disconnectDevice() {
     
     isConnected = false;
     
-    // Close reader
-    if (reader) {
-        try {
-            await reader.cancel();
-            reader.releaseLock();
-        } catch (error) {
-            console.error('Reader close error:', error);
-        }
-        reader = null;
-    }
-    
-    // Close writer
-    if (writer) {
-        try {
-            writer.releaseLock();
-        } catch (error) {
-            console.error('Writer close error:', error);
-        }
-        writer = null;
-    }
-    
-    // Close port
+    // Close WebUSB device
     if (port) {
         try {
             await port.close();
         } catch (error) {
-            console.error('Port close error:', error);
+            console.error('Device close error:', error);
         }
         port = null;
     }
+    
+    writer = null;
+    reader = null;
     
     statusDisplay.textContent = 'Disconnected';
     statusDisplay.className = 'status';
@@ -726,27 +708,24 @@ async function readLoop() {
     if (!port || !isConnected) return;
     
     try {
-        const decoder = new TextDecoderStream();
-        port.readable.pipeTo(decoder.writable);
-        reader = decoder.readable.getReader();
-        
-        while (isConnected && reader) {
-            const { value, done } = await reader.read();
-            if (done) break;
+        const result = await port.transferIn(1, 64);
+        if (result.data && result.data.byteLength > 0) {
+            const decoder = new TextDecoder();
+            const text = decoder.decode(result.data);
+            console.log('Received:', text);
             
-            if (value && value.trim()) {
-                console.log('Received:', value.trim());
-                parseReceivedData(value);
-            }
+            // Parse received data and update sliders
+            parseReceivedData(text);
         }
         
-    } catch (error) {
+        // Continue reading
         if (isConnected) {
-            console.error('Read error:', error);
-            // Try to reconnect reader after a delay
-            setTimeout(() => {
-                if (isConnected) readLoop();
-            }, 1000);
+            setTimeout(readLoop, 10);
+        }
+    } catch (error) {
+        console.error('Read error:', error);
+        if (isConnected) {
+            setTimeout(readLoop, 100);
         }
     }
 }
@@ -777,11 +756,11 @@ function parseReceivedData(data) {
 }
 
 async function sendCurrentValues() {
-    if (!port || !isConnected || !writer) return;
+    if (!port || !isConnected) return;
     
     try {
-        // Create data array in the format expected by the RP2040 firmware
-        const values = [
+        // Send data in the format expected by the RP2040 firmware (WebUSB binary)
+        const data = new Uint8Array([
             parseInt(sliders.dx1.value), // A1 - volumeSlider1
             parseInt(sliders.dx0.value), // A0 - volumeSlider0  
             parseInt(sliders.dx2.value), // A2 - volumeSlider2
@@ -791,15 +770,10 @@ async function sendCurrentValues() {
             parseInt(sliders.dx6.value), // D - volumeSlider6
             parseInt(sliders.dx7.value), // H - volumeSlider7
             parseInt(sliders.dx8.value)  // A - volumeSlider8
-        ];
+        ]);
         
-        // Send as text format (common for RP2040 serial communication)
-        const dataString = values.join(',') + '\n';
-        const encoder = new TextEncoder();
-        const data = encoder.encode(dataString);
-        
-        await writer.write(data);
-        console.log('Sent values:', values);
+        await port.transferOut(1, data);
+        console.log('Sent values:', Array.from(data));
         
     } catch (error) {
         console.error('Send error:', error);
@@ -808,14 +782,12 @@ async function sendCurrentValues() {
 }
 
 async function requestValues() {
-    if (!port || !isConnected || !writer) return;
+    if (!port || !isConnected) return;
     
     try {
-        // Send request command (text-based for RP2040 serial)
-        const encoder = new TextEncoder();
-        const command = encoder.encode('REQUEST\n');
-        
-        await writer.write(command);
+        // Send request command (based on original interface)
+        const data = new Uint8Array([255]); // Request command
+        await port.transferOut(1, data);
         console.log('Requested current values');
         
     } catch (error) {
@@ -825,14 +797,12 @@ async function requestValues() {
 }
 
 async function saveToMemory() {
-    if (!port || !isConnected || !writer) return;
+    if (!port || !isConnected) return;
     
     try {
-        // Send save command (text-based)
-        const encoder = new TextEncoder();
-        const command = encoder.encode('SAVE\n');
-        
-        await writer.write(command);
+        // Send save command (WebUSB binary)
+        const data = new Uint8Array([254]); // Save command
+        await port.transferOut(1, data);
         console.log('Save command sent');
         
         // Visual feedback
@@ -866,12 +836,12 @@ if (saveBtn) {
     saveBtn.addEventListener('click', saveToMemory);
 }
 
-// Check for Web Serial API support
-if (!navigator.serial) {
-    statusDisplay.textContent = 'Web Serial not supported. Use Chrome 89+ or Edge 89+.';
+// Check for WebUSB support
+if (!navigator.usb) {
+    statusDisplay.textContent = 'WebUSB not supported. Use Chrome 89+ or Edge 89+.';
     statusDisplay.className = 'status';
     connectBtn.disabled = true;
 } else {
-    statusDisplay.textContent = 'Ready to connect (Web Serial API)';
+    statusDisplay.textContent = 'Ready to connect (WebUSB API)';
     statusDisplay.className = 'status';
 }
