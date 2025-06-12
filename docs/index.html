@@ -742,52 +742,66 @@
             console.log('Parsing received data:', data);
             
             try {
-                // Try multiple parsing methods
-                const lines = data.trim().split('\n');
-                console.log('Split into lines:', lines);
-                
-                // Look for numerical values
-                const values = [];
-                for (const line of lines) {
-                    const cleaned = line.trim();
-                    if (cleaned && !isNaN(cleaned)) {
-                        values.push(parseInt(cleaned));
-                    }
-                }
-                
-                console.log('Extracted values:', values);
-                
-                if (values.length >= 9) {
-                    console.log('Updating sliders with received values');
+                // The device might send binary data back - let's handle both
+                if (typeof data === 'string') {
+                    // Text data
+                    const lines = data.trim().split('\n');
+                    console.log('Split into lines:', lines);
                     
-                    // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
-                    const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
-                    
-                    values.forEach((value, index) => {
-                        if (mapping[index] && sliders[mapping[index]]) {
-                            console.log(`Setting ${mapping[index]} to ${value}`);
-                            sliders[mapping[index]].value = value;
-                            valueDisplays[mapping[index]].textContent = value;
-                            updateSliderBackground(sliders[mapping[index]]);
+                    const values = [];
+                    for (const line of lines) {
+                        const cleaned = line.trim();
+                        if (cleaned && !isNaN(cleaned)) {
+                            values.push(parseInt(cleaned));
                         }
-                    });
+                    }
                     
-                    statusDisplay.textContent = 'Settings loaded from device successfully!';
-                    statusDisplay.className = 'status connected';
-                } else if (values.length > 0) {
-                    statusDisplay.textContent = `Received ${values.length} values, need 9 for complete settings`;
+                    console.log('Extracted values:', values);
+                    
+                    if (values.length >= 9) {
+                        updateSlidersWithValues(values);
+                    }
+                } else {
+                    // Binary data - convert to array
+                    const values = Array.from(new Uint8Array(data));
+                    console.log('Binary values received:', values);
+                    
+                    if (values.length >= 9) {
+                        updateSlidersWithValues(values);
+                    }
                 }
             } catch (error) {
                 console.error('Parse error:', error);
             }
+        }
+        
+        function updateSlidersWithValues(values) {
+            console.log('Updating sliders with values:', values);
+            
+            // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
+            const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
+            
+            values.slice(0, 9).forEach((value, index) => {
+                if (mapping[index] && sliders[mapping[index]]) {
+                    console.log(`Setting ${mapping[index]} to ${value}`);
+                    sliders[mapping[index]].value = value;
+                    valueDisplays[mapping[index]].textContent = value;
+                    updateSliderBackground(sliders[mapping[index]]);
+                }
+            });
+            
+            statusDisplay.textContent = 'Settings loaded from device successfully!';
+            statusDisplay.className = 'status connected';
         }
 
         async function sendCurrentValues() {
             if (!port || !isConnected || !writer) return;
             
             try {
-                // Send data in the exact format the original Japanese interface uses
-                const values = [
+                console.log('Sending values (binary format)...');
+                
+                // Send as binary data like the original Japanese interface
+                const values = new Uint8Array([
                     parseInt(sliders.dx1.value), // A1 - Right Surface
                     parseInt(sliders.dx0.value), // A0 - Right Rim  
                     parseInt(sliders.dx2.value), // A2 - Left Surface
@@ -797,22 +811,15 @@
                     parseInt(sliders.dx6.value), // D-delay
                     parseInt(sliders.dx7.value), // H-delay
                     parseInt(sliders.dx8.value)  // A-delay
-                ];
+                ]);
                 
-                console.log('Sending values:', values);
+                console.log('Sending binary values:', Array.from(values));
                 
-                // Try multiple formats to match original interface
+                // Send as raw binary data
+                await writer.write(values);
                 
-                // Format 1: Line-by-line (like original)
-                for (let i = 0; i < values.length; i++) {
-                    const line = values[i].toString() + '\n';
-                    const data = new TextEncoder().encode(line);
-                    await writer.write(data);
-                    await new Promise(resolve => setTimeout(resolve, 10)); // Small delay
-                }
-                
-                console.log('Values sent successfully');
-                statusDisplay.textContent = 'Settings sent to device';
+                console.log('Binary values sent successfully');
+                statusDisplay.textContent = 'Settings sent to device (binary)';
                 
             } catch (error) {
                 console.error('Send error:', error);
@@ -824,19 +831,14 @@
             if (!port || !isConnected || !writer) return;
             
             try {
-                console.log('Requesting values from device...');
+                console.log('Requesting values (binary format)...');
                 
-                // Try different request formats
-                const requests = ['REQUEST\n', 'GET\n', 'R\n', '\n'];
+                // Send request command as binary (like original interface)
+                const requestCommand = new Uint8Array([255]); // 255 = request command
                 
-                for (const req of requests) {
-                    const data = new TextEncoder().encode(req);
-                    await writer.write(data);
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                }
-                
-                console.log('Request sent');
-                statusDisplay.textContent = 'Requested settings from device';
+                await writer.write(requestCommand);
+                console.log('Binary request sent');
+                statusDisplay.textContent = 'Requested settings from device (binary)';
                 
             } catch (error) {
                 console.error('Request error:', error);
