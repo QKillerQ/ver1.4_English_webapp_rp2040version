@@ -218,6 +218,22 @@
             text-align: center;
         }
 
+        /* NEW: Slider description styling */
+        .slider-description {
+            font-size: 10px;
+            color: #666;
+            margin: 8px 0 0 0;
+            line-height: 1.3;
+            opacity: 0.8;
+            font-style: italic;
+            padding: 0 4px;
+        }
+
+        .slider-container:hover .slider-description {
+            opacity: 1;
+            color: #444;
+        }
+
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
@@ -380,6 +396,7 @@
                     <span id="valueDx3" class="slider-value">80</span>
                 </div>
                 <input type="range" min="0" max="500" step="5" value="80" id="dx3"/>
+                <p class="slider-description">Threshold for left rim sensor. Lower values = more sensitive.</p>
             </div>
 
             <div class="slider-container surface">
@@ -391,6 +408,7 @@
                     <span id="valueDx2" class="slider-value">130</span>
                 </div>
                 <input type="range" min="0" max="500" step="5" value="130" id="dx2"/>
+                <p class="slider-description">Threshold for left surface sensor. Lower values = more sensitive.</p>
             </div>
 
             <div class="slider-container surface">
@@ -402,6 +420,7 @@
                     <span id="valueDx1" class="slider-value">130</span>
                 </div>
                 <input type="range" min="0" max="500" step="5" value="130" id="dx1"/>
+                <p class="slider-description">Threshold for right surface sensor. Lower values = more sensitive.</p>
             </div>
 
             <div class="slider-container">
@@ -413,6 +432,7 @@
                     <span id="valueDx0" class="slider-value">80</span>
                 </div>
                 <input type="range" min="0" max="500" step="5" value="80" id="dx0"/>
+                <p class="slider-description">Threshold for right rim sensor. Lower values = more sensitive.</p>
             </div>
         </div>
 
@@ -428,6 +448,7 @@
                     <span id="valueDx8" class="slider-value">1</span>
                 </div>
                 <input type="range" min="1" max="50" step="1" value="1" id="dx8"/>
+                <p class="slider-description">Prevents double-hits on same pad. Increase if getting unwanted double-hits.</p>
             </div>
 
             <div class="slider-container">
@@ -439,6 +460,7 @@
                     <span id="valueDx4" class="slider-value">10</span>
                 </div>
                 <input type="range" min="1" max="80" step="1" value="10" id="dx4"/>
+                <p class="slider-description">Surface pad lockout after any hit. Don't set too high or rapid hits won't register.</p>
             </div>
 
             <div class="slider-container">
@@ -450,6 +472,7 @@
                     <span id="valueDx5" class="slider-value">30</span>
                 </div>
                 <input type="range" min="1" max="80" step="1" value="30" id="dx5"/>
+                <p class="slider-description">Rim pad lockout after any hit. Similar to Setting #2 but for rim pads.</p>
             </div>
 
             <div class="slider-container">
@@ -461,6 +484,7 @@
                     <span id="valueDx6" class="slider-value">32</span>
                 </div>
                 <input type="range" min="1" max="80" step="1" value="32" id="dx6"/>
+                <p class="slider-description">Prevents rim triggering when surface is hit and vice versa.</p>
             </div>
 
             <div class="slider-container">
@@ -472,6 +496,7 @@
                     <span id="valueDx7" class="slider-value">0</span>
                 </div>
                 <input type="range" min="0" max="80" step="1" value="0" id="dx7"/>
+                <p class="slider-description">Special timing for rhythm games. Use 0 for most games, try 20 if issues occur.</p>
             </div>
         </div>
 
@@ -862,6 +887,3 @@ if (!navigator.serial) {
     statusDisplay.textContent = 'Ready to connect (Web Serial API)';
     statusDisplay.className = 'status';
 }
-    </script>
-</body>
-</html>
