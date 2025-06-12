@@ -378,9 +378,10 @@
             <div class="button-row">
                 <button id="connect" class="btn">Connect</button>
                 <button id="disconnect" class="btn" disabled>Disconnect</button>
-                <button id="sendButton" class="btn" disabled>Send Settings</button>
-                <button id="requestButton" class="btn" disabled>Request Settings</button>
-                <button id="saveButton" class="btn save" disabled>Save to Memory</button>
+                <button id="sendSensitivity" class="btn" disabled>Send Sensitivity</button>
+                <button id="requestSensitivity" class="btn" disabled>Request Sensitivity</button>
+                <button id="sensitivityTransmission" class="btn" disabled>Sensitivity Transmission</button>
+                <button id="saveButton" class="btn save" disabled>Save</button>
             </div>
         </div>
 
@@ -562,8 +563,10 @@
         // Get UI elements
         const connectBtn = document.getElementById('connect');
         const disconnectBtn = document.getElementById('disconnect');
-        const sendBtn = document.getElementById('sendButton');
-        const requestBtn = document.getElementById('requestButton');
+        const sendSensitivityBtn = document.getElementById('sendSensitivity');
+        const requestSensitivityBtn = document.getElementById('requestSensitivity');
+        const sensitivityTransmissionBtn = document.getElementById('sensitivityTransmission');
+        const saveBtn = document.getElementById('saveButton');
         const statusDisplay = document.getElementById('status');
 
         // Slider mappings to match original Japanese interface
@@ -654,12 +657,10 @@
                 
                 connectBtn.disabled = true;
                 disconnectBtn.disabled = false;
-                sendBtn.disabled = false;
-                requestBtn.disabled = false;
-                
-                // Enable save button
-                const saveBtn = document.getElementById('saveButton');
-                if (saveBtn) saveBtn.disabled = false;
+                sendSensitivityBtn.disabled = false;
+                requestSensitivityBtn.disabled = false;
+                sensitivityTransmissionBtn.disabled = false;
+                saveBtn.disabled = false;
                 
                 readLoop();
                 
@@ -714,11 +715,10 @@
             
             connectBtn.disabled = false;
             disconnectBtn.disabled = true;
-            sendBtn.disabled = true;
-            requestBtn.disabled = true;
-            
-            const saveBtn = document.getElementById('saveButton');
-            if (saveBtn) saveBtn.disabled = true;
+            sendSensitivityBtn.disabled = true;
+            requestSensitivityBtn.disabled = true;
+            sensitivityTransmissionBtn.disabled = true;
+            saveBtn.disabled = true;
         }
 
         async function readLoop() {
@@ -825,11 +825,31 @@
             statusDisplay.className = 'status connected';
         }
 
+        // Sensitivity Transmission function (matches Japanese interface)
+        async function sensitivityTransmission() {
+            if (!port || !isConnected || !writer) return;
+            
+            try {
+                console.log('Sensitivity Transmission (like Japanese interface)...');
+                
+                // This might be the actual transmission command
+                const transmissionCommand = new Uint8Array([252]); // Different command
+                
+                await writer.write(transmissionCommand);
+                console.log('Sensitivity transmission command sent');
+                statusDisplay.textContent = 'Sensitivity transmitted to connector';
+                
+            } catch (error) {
+                console.error('Transmission error:', error);
+                statusDisplay.textContent = 'Transmission failed: ' + error.message;
+            }
+        }
+        // Send Sensitivity function (matches Japanese interface)  
         async function sendCurrentValues() {
             if (!port || !isConnected || !writer) return;
             
             try {
-                console.log('Sending values (binary format)...');
+                console.log('Send Sensitivity (like Japanese interface)...');
                 
                 // Send as binary data like the original Japanese interface
                 const values = new Uint8Array([
@@ -844,35 +864,36 @@
                     parseInt(sliders.dx8.value)  // A-delay
                 ]);
                 
-                console.log('Sending binary values:', Array.from(values));
+                console.log('Sending sensitivity values:', Array.from(values));
                 
                 // Send as raw binary data
                 await writer.write(values);
                 
-                console.log('Binary values sent successfully');
-                statusDisplay.textContent = 'Settings sent to device (binary)';
+                console.log('Sensitivity values sent successfully');
+                statusDisplay.textContent = 'Default sensitivity written to device';
                 
             } catch (error) {
-                console.error('Send error:', error);
+                console.error('Send sensitivity error:', error);
                 statusDisplay.textContent = 'Send failed: ' + error.message;
             }
         }
 
+        // Request Sensitivity function (matches Japanese interface)
         async function requestValues() {
             if (!port || !isConnected || !writer) return;
             
             try {
-                console.log('Requesting values from device...');
+                console.log('Request Sensitivity (like Japanese interface)...');
                 
                 // Try the exact command the Japanese interface uses
                 const requestCommand = new Uint8Array([255]); // Standard request command
                 
                 await writer.write(requestCommand);
-                console.log('Request command sent');
-                statusDisplay.textContent = 'Requesting settings from device...';
+                console.log('Request sensitivity command sent');
+                statusDisplay.textContent = 'Reading sensitivity from device...';
                 
             } catch (error) {
-                console.error('Request error:', error);
+                console.error('Request sensitivity error:', error);
                 statusDisplay.textContent = 'Request failed: ' + error.message;
             }
         }
@@ -914,13 +935,10 @@
         // Event listeners
         connectBtn.addEventListener('click', connectDevice);
         disconnectBtn.addEventListener('click', disconnectDevice);
-        sendBtn.addEventListener('click', sendCurrentValues);
-        requestBtn.addEventListener('click', requestValues);
-        
-        const saveBtn = document.getElementById('saveButton');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', saveToMemory);
-        }
+        sendSensitivityBtn.addEventListener('click', sendCurrentValues);
+        requestSensitivityBtn.addEventListener('click', requestValues);
+        sensitivityTransmissionBtn.addEventListener('click', sensitivityTransmission);
+        saveBtn.addEventListener('click', saveToMemory);
 
         // Check for Web Serial API support
         if (!navigator.serial) {
