@@ -529,232 +529,339 @@
 
     <script>
         // Global variables
-        let device = null;
-        let isConnected = false;
-        
-        // Get UI elements
-        const connectBtn = document.getElementById('connect');
-        const disconnectBtn = document.getElementById('disconnect');
-        const sendBtn = document.getElementById('sendButton');
-        const requestBtn = document.getElementById('requestButton');
-        const statusDisplay = document.getElementById('status');
-        
-        // Slider mappings to match original Japanese interface
-        const sliders = {
-            dx0: document.getElementById('dx0'),   // volumeSlider0 - A0 Right Rim
-            dx1: document.getElementById('dx1'),   // volumeSlider1 - A1 Right Surface  
-            dx2: document.getElementById('dx2'),   // volumeSlider2 - A2 Left Surface
-            dx3: document.getElementById('dx3'),   // volumeSlider3 - A3 Left Rim
-            dx4: document.getElementById('dx4'),   // volumeSlider4 - B-delay
-            dx5: document.getElementById('dx5'),   // volumeSlider5 - C-delay
-            dx6: document.getElementById('dx6'),   // volumeSlider6 - D-delay
-            dx7: document.getElementById('dx7'),   // volumeSlider7 - H-delay
-            dx8: document.getElementById('dx8')    // volumeSlider8 - A-delay
-        };
-        
-        const valueDisplays = {
-            dx0: document.getElementById('valueDx0'),
-            dx1: document.getElementById('valueDx1'),
-            dx2: document.getElementById('valueDx2'),
-            dx3: document.getElementById('valueDx3'),
-            dx4: document.getElementById('valueDx4'),
-            dx5: document.getElementById('valueDx5'),
-            dx6: document.getElementById('valueDx6'),
-            dx7: document.getElementById('valueDx7'),
-            dx8: document.getElementById('valueDx8')
-        };
+let port = null;
+let writer = null;
+let reader = null;
+let isConnected = false;
 
-        // Update slider background visual
-        function updateSliderBackground(slider) {
-            const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-            slider.style.background = `linear-gradient(90deg, #4299e1 ${value}%, #e2e8f0 ${value}%)`;
+// Get UI elements
+const connectBtn = document.getElementById('connect');
+const disconnectBtn = document.getElementById('disconnect');
+const sendBtn = document.getElementById('sendButton');
+const requestBtn = document.getElementById('requestButton');
+const statusDisplay = document.getElementById('status');
+
+// Slider mappings to match original Japanese interface
+const sliders = {
+    dx0: document.getElementById('dx0'),   // volumeSlider0 - A0 Right Rim
+    dx1: document.getElementById('dx1'),   // volumeSlider1 - A1 Right Surface  
+    dx2: document.getElementById('dx2'),   // volumeSlider2 - A2 Left Surface
+    dx3: document.getElementById('dx3'),   // volumeSlider3 - A3 Left Rim
+    dx4: document.getElementById('dx4'),   // volumeSlider4 - B-delay
+    dx5: document.getElementById('dx5'),   // volumeSlider5 - C-delay
+    dx6: document.getElementById('dx6'),   // volumeSlider6 - D-delay
+    dx7: document.getElementById('dx7'),   // volumeSlider7 - H-delay
+    dx8: document.getElementById('dx8')    // volumeSlider8 - A-delay
+};
+
+const valueDisplays = {
+    dx0: document.getElementById('valueDx0'),
+    dx1: document.getElementById('valueDx1'),
+    dx2: document.getElementById('valueDx2'),
+    dx3: document.getElementById('valueDx3'),
+    dx4: document.getElementById('valueDx4'),
+    dx5: document.getElementById('valueDx5'),
+    dx6: document.getElementById('valueDx6'),
+    dx7: document.getElementById('valueDx7'),
+    dx8: document.getElementById('valueDx8')
+};
+
+// Update slider background visual
+function updateSliderBackground(slider) {
+    const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+    slider.style.background = `linear-gradient(90deg, #4299e1 ${value}%, #e2e8f0 ${value}%)`;
+}
+
+// Initialize all sliders
+Object.values(sliders).forEach(slider => {
+    updateSliderBackground(slider);
+    slider.addEventListener('input', function() {
+        const key = Object.keys(sliders).find(k => sliders[k] === this);
+        valueDisplays[key].textContent = this.value;
+        updateSliderBackground(this);
+        if (isConnected) {
+            sendCurrentValues();
         }
+    });
+});
 
-        // Initialize all sliders
-        Object.values(sliders).forEach(slider => {
-            updateSliderBackground(slider);
-            slider.addEventListener('input', function() {
-                const key = Object.keys(sliders).find(k => sliders[k] === this);
-                valueDisplays[key].textContent = this.value;
-                updateSliderBackground(this);
-                if (isConnected) {
-                    sendCurrentValues();
+// Web Serial API Connection (FIXED VERSION)
+async function connectDevice() {
+    try {
+        // Check for already paired devices first
+        const availablePorts = await navigator.serial.getPorts();
+        let targetPort = null;
+        
+        // Look for previously paired HIDtaiko device
+        for (const serialPort of availablePorts) {
+            const info = serialPort.getInfo();
+            // Check for RP2040 vendor IDs
+            if (info.usbVendorId === 0x2E8A ||  // Raspberry Pi Foundation
+                info.usbVendorId === 0x239A ||  // Adafruit RP2040
+                info.usbVendorId === 0xCAFE) {   // TinyUSB default
+                targetPort = serialPort;
+                console.log('Found paired HIDtaiko device:', info);
+                break;
+            }
+        }
+        
+        // If no paired device found, request new connection
+        if (!targetPort) {
+            console.log('No paired device found, requesting new connection...');
+            targetPort = await navigator.serial.requestPort({
+                filters: [
+                    { usbVendorId: 0x2E8A }, // RP2040 official
+                    { usbVendorId: 0x239A }, // Adafruit RP2040
+                    { usbVendorId: 0xCAFE }  // TinyUSB fallback
+                ]
+            });
+        }
+        
+        // Open serial connection with RP2040 settings
+        await targetPort.open({
+            baudRate: 115200,
+            dataBits: 8,
+            stopBits: 1,
+            parity: 'none',
+            flowControl: 'none'
+        });
+        
+        port = targetPort;
+        writer = port.writable.getWriter();
+        isConnected = true;
+        
+        statusDisplay.textContent = 'Connected to HIDtaiko RP2040 (Serial)';
+        statusDisplay.className = 'status connected';
+        
+        connectBtn.disabled = true;
+        disconnectBtn.disabled = false;
+        sendBtn.disabled = false;
+        requestBtn.disabled = false;
+        
+        // Start listening for data
+        readLoop();
+        
+        console.log('HIDtaiko RP2040 connected successfully via Serial!');
+        
+    } catch (error) {
+        console.error('Connection failed:', error);
+        
+        let errorMessage = 'Connection failed';
+        if (error.name === 'NotFoundError') {
+            errorMessage = 'No device selected. Please select your HIDtaiko device.';
+        } else if (error.name === 'NetworkError') {
+            errorMessage = 'Device busy. Close other programs using this device.';
+        } else if (error.name === 'InvalidStateError') {
+            errorMessage = 'Device already in use. Try disconnecting first.';
+        } else {
+            errorMessage = `Connection failed: ${error.message}`;
+        }
+        
+        statusDisplay.textContent = errorMessage;
+        statusDisplay.className = 'status';
+    }
+}
+
+async function disconnectDevice() {
+    console.log('Disconnecting from HIDtaiko device...');
+    
+    isConnected = false;
+    
+    // Close reader
+    if (reader) {
+        try {
+            await reader.cancel();
+            reader.releaseLock();
+        } catch (error) {
+            console.error('Reader close error:', error);
+        }
+        reader = null;
+    }
+    
+    // Close writer
+    if (writer) {
+        try {
+            writer.releaseLock();
+        } catch (error) {
+            console.error('Writer close error:', error);
+        }
+        writer = null;
+    }
+    
+    // Close port
+    if (port) {
+        try {
+            await port.close();
+        } catch (error) {
+            console.error('Port close error:', error);
+        }
+        port = null;
+    }
+    
+    statusDisplay.textContent = 'Disconnected';
+    statusDisplay.className = 'status';
+    
+    connectBtn.disabled = false;
+    disconnectBtn.disabled = true;
+    sendBtn.disabled = true;
+    requestBtn.disabled = true;
+    
+    console.log('HIDtaiko device disconnected');
+}
+
+async function readLoop() {
+    if (!port || !isConnected) return;
+    
+    try {
+        const decoder = new TextDecoderStream();
+        port.readable.pipeTo(decoder.writable);
+        reader = decoder.readable.getReader();
+        
+        while (isConnected && reader) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            
+            if (value && value.trim()) {
+                console.log('Received:', value.trim());
+                parseReceivedData(value);
+            }
+        }
+        
+    } catch (error) {
+        if (isConnected) {
+            console.error('Read error:', error);
+            // Try to reconnect reader after a delay
+            setTimeout(() => {
+                if (isConnected) readLoop();
+            }, 1000);
+        }
+    }
+}
+
+function parseReceivedData(data) {
+    // Parse data format from original Japanese interface
+    try {
+        const lines = data.trim().split('\n');
+        const values = lines.map(line => parseInt(line.trim())).filter(v => !isNaN(v));
+        
+        if (values.length >= 9) {
+            // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
+            const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
+            
+            values.forEach((value, index) => {
+                if (mapping[index] && sliders[mapping[index]]) {
+                    sliders[mapping[index]].value = value;
+                    valueDisplays[mapping[index]].textContent = value;
+                    updateSliderBackground(sliders[mapping[index]]);
                 }
             });
-        });
-
-        // WebUSB Connection
-        async function connectDevice() {
-            try {
-                const filters = [
-                    { vendorId: 0x2E8A }, // Raspberry Pi Pico
-                    { vendorId: 0x239A }  // Adafruit
-                ];
-                
-                device = await navigator.usb.requestDevice({ filters });
-                await device.open();
-                
-                if (device.configuration === null) {
-                    await device.selectConfiguration(1);
-                }
-                
-                await device.claimInterface(0);
-                
-                isConnected = true;
-                statusDisplay.textContent = 'Connected to HIDtaiko RP2040';
-                statusDisplay.className = 'status connected';
-                
-                connectBtn.disabled = true;
-                disconnectBtn.disabled = false;
-                sendBtn.disabled = false;
-                requestBtn.disabled = false;
-                
-                // Start listening for data
-                readLoop();
-                
-            } catch (error) {
-                console.error('Connection failed:', error);
-                statusDisplay.textContent = `Connection failed: ${error.message}`;
-                statusDisplay.className = 'status';
-            }
-        }
-
-        async function disconnectDevice() {
-            if (device) {
-                await device.close();
-                device = null;
-                isConnected = false;
-                
-                statusDisplay.textContent = 'Disconnected';
-                statusDisplay.className = 'status';
-                
-                connectBtn.disabled = false;
-                disconnectBtn.disabled = true;
-                sendBtn.disabled = true;
-                requestBtn.disabled = true;
-            }
-        }
-
-        async function readLoop() {
-            if (!device || !isConnected) return;
             
-            try {
-                const result = await device.transferIn(1, 64);
-                if (result.data && result.data.byteLength > 0) {
-                    const decoder = new TextDecoder();
-                    const text = decoder.decode(result.data);
-                    console.log('Received:', text);
-                    
-                    // Parse received data and update sliders
-                    parseReceivedData(text);
-                }
-                
-                // Continue reading
-                setTimeout(readLoop, 10);
-            } catch (error) {
-                console.error('Read error:', error);
-                if (isConnected) {
-                    setTimeout(readLoop, 100);
-                }
-            }
+            console.log('Updated sliders with received values:', values);
         }
+    } catch (error) {
+        console.error('Parse error:', error);
+    }
+}
 
-        function parseReceivedData(data) {
-            // Parse data format from original Japanese interface
-            try {
-                const lines = data.trim().split('\n');
-                const values = lines.map(line => parseInt(line.trim())).filter(v => !isNaN(v));
-                
-                if (values.length >= 9) {
-                    // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
-                    const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
-                    
-                    values.forEach((value, index) => {
-                        if (mapping[index] && sliders[mapping[index]]) {
-                            sliders[mapping[index]].value = value;
-                            valueDisplays[mapping[index]].textContent = value;
-                            updateSliderBackground(sliders[mapping[index]]);
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Parse error:', error);
-            }
-        }
+async function sendCurrentValues() {
+    if (!port || !isConnected || !writer) return;
+    
+    try {
+        // Create data array in the format expected by the RP2040 firmware
+        const values = [
+            parseInt(sliders.dx1.value), // A1 - volumeSlider1
+            parseInt(sliders.dx0.value), // A0 - volumeSlider0  
+            parseInt(sliders.dx2.value), // A2 - volumeSlider2
+            parseInt(sliders.dx3.value), // A3 - volumeSlider3
+            parseInt(sliders.dx4.value), // B - volumeSlider4
+            parseInt(sliders.dx5.value), // C - volumeSlider5
+            parseInt(sliders.dx6.value), // D - volumeSlider6
+            parseInt(sliders.dx7.value), // H - volumeSlider7
+            parseInt(sliders.dx8.value)  // A - volumeSlider8
+        ];
+        
+        // Send as text format (common for RP2040 serial communication)
+        const dataString = values.join(',') + '\n';
+        const encoder = new TextEncoder();
+        const data = encoder.encode(dataString);
+        
+        await writer.write(data);
+        console.log('Sent values:', values);
+        
+    } catch (error) {
+        console.error('Send error:', error);
+        statusDisplay.textContent = 'Send failed: ' + error.message;
+    }
+}
 
-        async function sendCurrentValues() {
-            if (!device || !isConnected) return;
+async function requestValues() {
+    if (!port || !isConnected || !writer) return;
+    
+    try {
+        // Send request command (text-based for RP2040 serial)
+        const encoder = new TextEncoder();
+        const command = encoder.encode('REQUEST\n');
+        
+        await writer.write(command);
+        console.log('Requested current values');
+        
+    } catch (error) {
+        console.error('Request error:', error);
+        statusDisplay.textContent = 'Request failed: ' + error.message;
+    }
+}
+
+async function saveToMemory() {
+    if (!port || !isConnected || !writer) return;
+    
+    try {
+        // Send save command (text-based)
+        const encoder = new TextEncoder();
+        const command = encoder.encode('SAVE\n');
+        
+        await writer.write(command);
+        console.log('Save command sent');
+        
+        // Visual feedback
+        const saveBtn = document.getElementById('saveButton');
+        if (saveBtn) {
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Saved!';
+            saveBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
             
-            try {
-                // Send data in the format expected by the RP2040 firmware
-                const data = new Uint8Array([
-                    parseInt(sliders.dx1.value), // A1 - volumeSlider1
-                    parseInt(sliders.dx0.value), // A0 - volumeSlider0  
-                    parseInt(sliders.dx2.value), // A2 - volumeSlider2
-                    parseInt(sliders.dx3.value), // A3 - volumeSlider3
-                    parseInt(sliders.dx4.value), // B - volumeSlider4
-                    parseInt(sliders.dx5.value), // C - volumeSlider5
-                    parseInt(sliders.dx6.value), // D - volumeSlider6
-                    parseInt(sliders.dx7.value), // H - volumeSlider7
-                    parseInt(sliders.dx8.value)  // A - volumeSlider8
-                ]);
-                
-                await device.transferOut(1, data);
-                console.log('Sent values:', Array.from(data));
-            } catch (error) {
-                console.error('Send error:', error);
-            }
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+                saveBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
+            }, 2000);
         }
+        
+    } catch (error) {
+        console.error('Save error:', error);
+        statusDisplay.textContent = 'Save failed: ' + error.message;
+    }
+}
 
-        async function requestValues() {
-            if (!device || !isConnected) return;
-            
-            try {
-                // Send request command (based on original interface)
-                const data = new Uint8Array([255]); // Request command
-                await device.transferOut(1, data);
-                console.log('Requested current values');
-            } catch (error) {
-                console.error('Request error:', error);
-            }
-        }
+// Event listeners
+connectBtn.addEventListener('click', connectDevice);
+disconnectBtn.addEventListener('click', disconnectDevice);
+sendBtn.addEventListener('click', sendCurrentValues);
+requestBtn.addEventListener('click', requestValues);
 
-        async function saveToMemory() {
-            if (!device || !isConnected) return;
-            
-            try {
-                // Send save command
-                const data = new Uint8Array([254]); // Save command
-                await device.transferOut(1, data);
-                console.log('Save command sent');
-                
-                // Visual feedback
-                const originalText = saveBtn.textContent;
-                saveBtn.textContent = 'Saved!';
-                saveBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
-                
-                setTimeout(() => {
-                    saveBtn.textContent = originalText;
-                    saveBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Save error:', error);
-            }
-        }
+// Add save button listener if it exists
+const saveBtn = document.getElementById('saveButton');
+if (saveBtn) {
+    saveBtn.addEventListener('click', saveToMemory);
+}
 
-        // Event listeners
-        connectBtn.addEventListener('click', connectDevice);
-        disconnectBtn.addEventListener('click', disconnectDevice);
-        sendBtn.addEventListener('click', sendCurrentValues);
-        requestBtn.addEventListener('click', requestValues);
-
-        // Check for WebUSB support
-        if (!navigator.usb) {
-            statusDisplay.textContent = 'WebUSB not supported. Use Chrome or Edge browser.';
-            statusDisplay.className = 'status';
-            connectBtn.disabled = true;
-        }
+// Check for Web Serial API support
+if (!navigator.serial) {
+    statusDisplay.textContent = 'Web Serial not supported. Use Chrome 89+ or Edge 89+.';
+    statusDisplay.className = 'status';
+    connectBtn.disabled = true;
+} else {
+    statusDisplay.textContent = 'Ready to connect (Web Serial API)';
+    statusDisplay.className = 'status';
+}
     </script>
 </body>
 </html>
