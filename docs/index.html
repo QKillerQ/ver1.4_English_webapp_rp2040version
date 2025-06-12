@@ -82,6 +82,12 @@
             border-left: 4px solid #4299e1;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+        .slider-container.surface {
+            border-left: 4px solid #e53e3e;
+        }
+        .slider-container.surface .slider-value {
+            background: #e53e3e;
+        }
         .slider-header {
             display: flex;
             justify-content: space-between;
@@ -92,6 +98,11 @@
             font-weight: 600;
             color: #2d3748;
         }
+        .drum-label {
+            font-size: 0.9em;
+            color: #718096;
+            font-style: italic;
+        }
         .slider-value {
             background: #4299e1;
             color: white;
@@ -100,6 +111,117 @@
             font-weight: 600;
             min-width: 40px;
             text-align: center;
+        }
+        .slider-description {
+            font-size: 10px;
+            color: #666;
+            margin: 8px 0 0 0;
+            line-height: 1.3;
+            opacity: 0.8;
+            font-style: italic;
+            padding: 0 4px;
+        }
+        .slider-container:hover .slider-description {
+            opacity: 1;
+            color: #444;
+        }
+        .advanced-section {
+            margin-top: 30px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .advanced-toggle {
+            background: #f7fafc;
+            padding: 15px 20px;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .advanced-toggle:hover {
+            background: #edf2f7;
+        }
+        .advanced-toggle.expanded {
+            background: #e6fffa;
+            border-bottom: 2px solid #4fd1c7;
+        }
+        .toggle-arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.2em;
+            color: #4a5568;
+        }
+        .toggle-arrow.expanded {
+            transform: rotate(180deg);
+        }
+        .advanced-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .advanced-content.expanded {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in;
+        }
+        .advanced-inner {
+            padding: 20px;
+        }
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .instructions {
+            background: #edf2f7;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #38a169;
+        }
+        .instructions h3 {
+            color: #2d3748;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .parameter-help {
+            background: #f0fff4;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #68d391;
+        }
+        .parameter-help h3 {
+            color: #22543d;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .parameter-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .parameter-item strong {
+            color: #2d3748;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
         }
         input[type="range"] {
             width: 100%;
@@ -128,34 +250,186 @@
 
         <div class="slider-container">
             <div class="slider-header">
-                <div class="slider-label">A0 - Right Rim</div>
+                <div>
+                    <div class="slider-label">A0 - Right Rim</div>
+                    <div class="drum-label">Outer edge, right side</div>
+                </div>
                 <span id="valueDx0" class="slider-value">80</span>
             </div>
             <input type="range" min="0" max="500" step="5" value="80" id="dx0"/>
+            <p class="slider-description">Threshold for right rim sensor. Lower values = more sensitive.</p>
         </div>
 
-        <div class="slider-container">
+        <div class="slider-container surface">
             <div class="slider-header">
-                <div class="slider-label">A1 - Right Surface</div>
+                <div>
+                    <div class="slider-label">A1 - Right Surface</div>
+                    <div class="drum-label">Main drum surface, right side</div>
+                </div>
                 <span id="valueDx1" class="slider-value">130</span>
             </div>
             <input type="range" min="0" max="500" step="5" value="130" id="dx1"/>
+            <p class="slider-description">Threshold for right surface sensor. Lower values = more sensitive.</p>
         </div>
 
-        <div class="slider-container">
+        <div class="slider-container surface">
             <div class="slider-header">
-                <div class="slider-label">A2 - Left Surface</div>
+                <div>
+                    <div class="slider-label">A2 - Left Surface</div>
+                    <div class="drum-label">Main drum surface, left side</div>
+                </div>
                 <span id="valueDx2" class="slider-value">130</span>
             </div>
             <input type="range" min="0" max="500" step="5" value="130" id="dx2"/>
+            <p class="slider-description">Threshold for left surface sensor. Lower values = more sensitive.</p>
         </div>
 
         <div class="slider-container">
             <div class="slider-header">
-                <div class="slider-label">A3 - Left Rim</div>
+                <div>
+                    <div class="slider-label">A3 - Left Rim</div>
+                    <div class="drum-label">Outer edge, left side</div>
+                </div>
                 <span id="valueDx3" class="slider-value">80</span>
             </div>
             <input type="range" min="0" max="500" step="5" value="80" id="dx3"/>
+            <p class="slider-description">Threshold for left rim sensor. Lower values = more sensitive.</p>
+        </div>
+
+        <!-- ADVANCED SECTION -->
+        <div class="advanced-section">
+            <div class="advanced-toggle" onclick="toggleAdvanced()">
+                <div>
+                    <h3 style="margin: 0; color: #2d3748;">🔧 Advanced Settings & Configuration</h3>
+                    <p style="margin: 5px 0 0 0; color: #718096; font-size: 0.9em;">Delay timers, parameter guide, and detailed instructions</p>
+                </div>
+                <span class="toggle-arrow">▼</span>
+            </div>
+            
+            <div class="advanced-content" id="advancedContent">
+                <div class="advanced-inner">
+                    
+                    <!-- DELAY TIMERS SECTION -->
+                    <div class="section">
+                        <h2 class="section-title">Input Delay Timers (milliseconds)</h2>
+
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div>
+                                    <div class="slider-label">Delay Setting #1 - Same Pad Lockout</div>
+                                    <div class="drum-label">Time before same pad can trigger again</div>
+                                </div>
+                                <span id="valueDx8" class="slider-value">1</span>
+                            </div>
+                            <input type="range" min="1" max="50" step="1" value="1" id="dx8"/>
+                            <p class="slider-description">Prevents double-hits on same pad. Increase if getting unwanted double-hits.</p>
+                        </div>
+
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div>
+                                    <div class="slider-label">Delay Setting #2 - Surface Pad Lockout</div>
+                                    <div class="drum-label">Surface pad lockout after any hit</div>
+                                </div>
+                                <span id="valueDx4" class="slider-value">10</span>
+                            </div>
+                            <input type="range" min="1" max="80" step="1" value="10" id="dx4"/>
+                            <p class="slider-description">Surface pad lockout after any hit. Don't set too high or rapid hits won't register.</p>
+                        </div>
+
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div>
+                                    <div class="slider-label">Delay Setting #3 - Rim Pad Lockout</div>
+                                    <div class="drum-label">Rim pad lockout after any hit</div>
+                                </div>
+                                <span id="valueDx5" class="slider-value">30</span>
+                            </div>
+                            <input type="range" min="1" max="80" step="1" value="30" id="dx5"/>
+                            <p class="slider-description">Rim pad lockout after any hit. Similar to Setting #2 but for rim pads.</p>
+                        </div>
+
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div>
+                                    <div class="slider-label">Delay Setting #4 - Cross Lockout</div>
+                                    <div class="drum-label">Cross-lockout between surface and rim</div>
+                                </div>
+                                <span id="valueDx6" class="slider-value">32</span>
+                            </div>
+                            <input type="range" min="1" max="80" step="1" value="32" id="dx6"/>
+                            <p class="slider-description">Prevents rim triggering when surface is hit and vice versa.</p>
+                        </div>
+
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div>
+                                    <div class="slider-label">Delay Setting #5 - Hold Adjustment</div>
+                                    <div class="drum-label">Compatibility for rhythm games (usually 0 or 20)</div>
+                                </div>
+                                <span id="valueDx7" class="slider-value">0</span>
+                            </div>
+                            <input type="range" min="0" max="80" step="1" value="0" id="dx7"/>
+                            <p class="slider-description">Special timing for rhythm games. Use 0 for most games, try 20 if issues occur.</p>
+                        </div>
+                    </div>
+
+                    <!-- INSTRUCTIONS -->
+                    <div class="instructions">
+                        <h3>📋 Setup Instructions</h3>
+                        <ol>
+                            <li><strong>Click "Connect"</strong> and select your HIDtaiko device (Chrome/Edge browser required)</li>
+                            <li><strong>Click "Default Values"</strong> to load recommended starting values</li>
+                            <li><strong>Adjust sliders</strong> to tune sensitivity and timing for your drums</li>
+                            <li><strong>Click "Save To Device"</strong> to save settings permanently to device</li>
+                            <li><strong>Use "Load Last Settings"</strong> to reload your saved settings anytime</li>
+                        </ol>
+                        <p><em><strong>💡 Tip:</strong> Sensitivity values are thresholds - lower numbers = higher sensitivity. Start with defaults and adjust gradually.</em></p>
+                    </div>
+
+                    <!-- PARAMETER GUIDE -->
+                    <div class="parameter-help">
+                        <h3>📖 Parameter Guide</h3>
+
+                        <div class="parameter-item">
+                            <strong>🎯 Sensitivity (A0-A3):</strong>
+                            Threshold values for piezo sensors. When sensor voltage exceeds this value, a key press is triggered. Lower values = more sensitive to light taps, higher values = requires harder hits.
+                        </div>
+
+                        <div class="parameter-item">
+                            <strong>⏱️ Delay Setting #1 (Same Pad Lockout):</strong>
+                            Prevents the same pad from triggering multiple times rapidly. Increase if you get unwanted double-hits on the same pad. Usually 1-5ms is sufficient.
+                        </div>
+
+                        <div class="parameter-item">
+                            <strong>⏱️ Delay Setting #2 (Surface Pad Lockout):</strong>
+                            Lockout time for surface pads after any pad is hit. Prevents multiple surface hits but don't set too high or rapid surface hits won't register. Default: 10ms.
+                        </div>
+
+                        <div class="parameter-item">
+                            <strong>⏱️ Delay Setting #3 (Rim Pad Lockout):</strong>
+                            Lockout time for rim pads after any pad is hit. Similar to Delay Setting #2 but specifically for rim pads. Usually slightly higher than surface delay. Default: 30ms.
+                        </div>
+
+                        <div class="parameter-item">
+                            <strong>⏱️ Delay Setting #4 (Cross Lockout):</strong>
+                            Cross-lockout between surface and rim pads. Prevents rim from triggering when surface is hit and vice versa. Critical for preventing false triggers. Default: 32ms.
+                        </div>
+
+                        <div class="parameter-item">
+                            <strong>⏱️ Delay Setting #5 (Hold Adjustment):</strong>
+                            Special timing adjustment for certain rhythm games. Use 0 for most games. Try 20ms if controller works in text editors but has issues in specific rhythm games.
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div style="text-align: center; margin-top: 30px; padding: 20px; background: #f7fafc; border-radius: 10px; border: 2px solid #e2e8f0;">
+                        <p><strong>🥁 HIDtaiko RP2040 English Interface</strong></p>
+                        <p style="color: #718096;">Enhanced English version with professional UI and persistent settings</p>
+                        <p style="color: #718096;">Based on original work by <a href="https://github.com/kasasiki3" target="_blank" style="color: #4299e1; text-decoration: none;">kasasiki3</a></p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -179,15 +453,42 @@
             dx0: document.getElementById('dx0'),
             dx1: document.getElementById('dx1'),
             dx2: document.getElementById('dx2'),
-            dx3: document.getElementById('dx3')
+            dx3: document.getElementById('dx3'),
+            dx4: document.getElementById('dx4'),  // B-delay
+            dx5: document.getElementById('dx5'),  // C-delay
+            dx6: document.getElementById('dx6'),  // D-delay
+            dx7: document.getElementById('dx7'),  // H-delay
+            dx8: document.getElementById('dx8')   // A-delay
         };
 
         const valueDisplays = {
             dx0: document.getElementById('valueDx0'),
             dx1: document.getElementById('valueDx1'),
             dx2: document.getElementById('valueDx2'),
-            dx3: document.getElementById('valueDx3')
+            dx3: document.getElementById('valueDx3'),
+            dx4: document.getElementById('valueDx4'),
+            dx5: document.getElementById('valueDx5'),
+            dx6: document.getElementById('valueDx6'),
+            dx7: document.getElementById('valueDx7'),
+            dx8: document.getElementById('valueDx8')
         };
+
+        // Toggle advanced section
+        function toggleAdvanced() {
+            const content = document.getElementById('advancedContent');
+            const toggle = document.querySelector('.advanced-toggle');
+            const arrow = document.querySelector('.toggle-arrow');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+                arrow.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                toggle.classList.add('expanded');
+                arrow.classList.add('expanded');
+            }
+        }
 
         // Update slider displays
         Object.keys(sliders).forEach(key => {
@@ -296,11 +597,23 @@
         function loadDefaultValues() {
             console.log('📝 Loading default values...');
             
-            const defaults = { dx0: 80, dx1: 130, dx2: 130, dx3: 80 };
+            const defaults = { 
+                dx0: 80,    // A0 Right Rim
+                dx1: 130,   // A1 Right Surface
+                dx2: 130,   // A2 Left Surface
+                dx3: 80,    // A3 Left Rim
+                dx4: 10,    // B-delay
+                dx5: 30,    // C-delay
+                dx6: 32,    // D-delay
+                dx7: 0,     // H-delay
+                dx8: 1      // A-delay
+            };
             
             Object.keys(defaults).forEach(key => {
-                sliders[key].value = defaults[key];
-                valueDisplays[key].textContent = defaults[key];
+                if (sliders[key]) {
+                    sliders[key].value = defaults[key];
+                    valueDisplays[key].textContent = defaults[key];
+                }
             });
             
             console.log('✅ Default values loaded');
@@ -312,11 +625,15 @@
 
             try {
                 const data = new Uint8Array([
-                    parseInt(sliders.dx1.value), // A1
-                    parseInt(sliders.dx0.value), // A0
-                    parseInt(sliders.dx2.value), // A2
-                    parseInt(sliders.dx3.value), // A3
-                    10, 30, 32, 0, 1  // Default delay values
+                    parseInt(sliders.dx1.value), // A1 - Right Surface
+                    parseInt(sliders.dx0.value), // A0 - Right Rim
+                    parseInt(sliders.dx2.value), // A2 - Left Surface
+                    parseInt(sliders.dx3.value), // A3 - Left Rim
+                    parseInt(sliders.dx4.value), // B-delay
+                    parseInt(sliders.dx5.value), // C-delay
+                    parseInt(sliders.dx6.value), // D-delay
+                    parseInt(sliders.dx7.value), // H-delay
+                    parseInt(sliders.dx8.value)  // A-delay
                 ]);
 
                 await writer.write(data);
@@ -362,19 +679,50 @@
                 dx1: parseInt(sliders.dx1.value),
                 dx2: parseInt(sliders.dx2.value),
                 dx3: parseInt(sliders.dx3.value),
+                dx4: parseInt(sliders.dx4.value),
+                dx5: parseInt(sliders.dx5.value),
+                dx6: parseInt(sliders.dx6.value),
+                dx7: parseInt(sliders.dx7.value),
+                dx8: parseInt(sliders.dx8.value),
                 timestamp: new Date().toISOString(),
                 deviceInfo: port ? port.getInfo() : null
             };
             
-            // Store in browser memory (not localStorage due to Claude limitations)
+            // Store in both memory and browser session storage for persistence
             window.hidtaikoSettings = currentSettings;
-            console.log('💾 Settings saved locally:', currentSettings);
+            
+            try {
+                // Also store in sessionStorage for persistence across connections
+                sessionStorage.setItem('hidtaikoSettings', JSON.stringify(currentSettings));
+                console.log('💾 Settings saved locally and to session storage:', currentSettings);
+            } catch (e) {
+                // Fallback to memory only if sessionStorage not available
+                console.log('💾 Settings saved to memory only:', currentSettings);
+            }
         }
 
         // Load previously saved settings from browser storage
         function loadSavedSettings() {
-            if (window.hidtaikoSettings) {
-                const settings = window.hidtaikoSettings;
+            let settings = null;
+            
+            // Try to load from sessionStorage first
+            try {
+                const stored = sessionStorage.getItem('hidtaikoSettings');
+                if (stored) {
+                    settings = JSON.parse(stored);
+                    console.log('📤 Loading settings from session storage');
+                }
+            } catch (e) {
+                console.log('⚠️ Could not access session storage');
+            }
+            
+            // Fallback to memory storage
+            if (!settings && window.hidtaikoSettings) {
+                settings = window.hidtaikoSettings;
+                console.log('📤 Loading settings from memory');
+            }
+            
+            if (settings) {
                 console.log('📤 Loading saved settings:', settings);
                 
                 // Update sliders with saved values
@@ -385,12 +733,15 @@
                     }
                 });
                 
+                // Also update memory storage
+                window.hidtaikoSettings = settings;
+                
                 console.log('✅ Saved settings loaded successfully!');
                 statusDisplay.textContent = `Settings loaded from ${new Date(settings.timestamp).toLocaleString()}`;
                 
                 return true;
             } else {
-                console.log('⚠️ No saved settings found');
+                console.log('⚠️ No saved settings found in storage or memory');
                 statusDisplay.textContent = 'No saved settings found - use Default Values';
                 return false;
             }
@@ -475,15 +826,14 @@
                 console.log('📊 Extracted values:', values);
                 
                 if (values.length >= 4) {
-                    // Update sliders with received values
-                    sliders.dx1.value = values[0] || 130; // A1
-                    sliders.dx0.value = values[1] || 80;  // A0
-                    sliders.dx2.value = values[2] || 130; // A2
-                    sliders.dx3.value = values[3] || 80;  // A3
+                    // Update sliders with received values [A1, A0, A2, A3, B, C, D, H, A]
+                    const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
                     
-                    // Update displays
-                    Object.keys(valueDisplays).forEach(key => {
-                        valueDisplays[key].textContent = sliders[key].value;
+                    values.forEach((value, index) => {
+                        if (mapping[index] && sliders[mapping[index]]) {
+                            sliders[mapping[index]].value = value;
+                            valueDisplays[mapping[index]].textContent = value;
+                        }
                     });
                     
                     console.log('✅ Successfully updated sliders!');
