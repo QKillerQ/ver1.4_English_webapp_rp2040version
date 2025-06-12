@@ -722,8 +722,13 @@
                     if (done) break;
                     
                     if (value && value.trim()) {
-                        console.log('Received:', value.trim());
+                        console.log('Received from device:', value.trim());
+                        
+                        // Try to parse any response from device
                         parseReceivedData(value);
+                        
+                        // Show raw data in status for debugging
+                        statusDisplay.textContent = `Data received: ${value.trim().substring(0, 50)}...`;
                     }
                 }
             } catch (error) {
@@ -734,20 +739,43 @@
         }
 
         function parseReceivedData(data) {
+            console.log('Parsing received data:', data);
+            
             try {
+                // Try multiple parsing methods
                 const lines = data.trim().split('\n');
-                const values = lines.map(line => parseInt(line.trim())).filter(v => !isNaN(v));
+                console.log('Split into lines:', lines);
+                
+                // Look for numerical values
+                const values = [];
+                for (const line of lines) {
+                    const cleaned = line.trim();
+                    if (cleaned && !isNaN(cleaned)) {
+                        values.push(parseInt(cleaned));
+                    }
+                }
+                
+                console.log('Extracted values:', values);
                 
                 if (values.length >= 9) {
+                    console.log('Updating sliders with received values');
+                    
+                    // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
                     const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
                     
                     values.forEach((value, index) => {
                         if (mapping[index] && sliders[mapping[index]]) {
+                            console.log(`Setting ${mapping[index]} to ${value}`);
                             sliders[mapping[index]].value = value;
                             valueDisplays[mapping[index]].textContent = value;
                             updateSliderBackground(sliders[mapping[index]]);
                         }
                     });
+                    
+                    statusDisplay.textContent = 'Settings loaded from device successfully!';
+                    statusDisplay.className = 'status connected';
+                } else if (values.length > 0) {
+                    statusDisplay.textContent = `Received ${values.length} values, need 9 for complete settings`;
                 }
             } catch (error) {
                 console.error('Parse error:', error);
