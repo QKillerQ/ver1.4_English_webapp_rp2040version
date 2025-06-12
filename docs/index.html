@@ -552,7 +552,7 @@
     </div>
 
     <script>
-        // Global variables
+        // Global variables (make sure these are let, not const)
         let port = null;
         let writer = null;
         let reader = null;
@@ -638,6 +638,7 @@
                 serialPort.readable.pipeTo(decoder.writable);
                 reader = decoder.readable.getReader();
                 
+                // Fix: Don't reassign port, just update the global variables
                 port = serialPort;
                 isConnected = true;
                 
@@ -658,6 +659,8 @@
                 let errorMessage = 'Connection failed';
                 if (error.name === 'NotFoundError') {
                     errorMessage = 'No HIDtaiko device selected. Please select your HIDtaiko device.';
+                } else {
+                    errorMessage = `Connection failed: ${error.message}`;
                 }
                 statusDisplay.textContent = errorMessage;
                 statusDisplay.className = 'status';
