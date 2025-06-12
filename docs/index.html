@@ -554,315 +554,318 @@
 
     <script>
         // Global variables
-let port = null;
-let writer = null;
-let reader = null;
-let isConnected = false;
+        let port = null;
+        let writer = null;
+        let reader = null;
+        let isConnected = false;
 
-// Get UI elements
-const connectBtn = document.getElementById('connect');
-const disconnectBtn = document.getElementById('disconnect');
-const sendBtn = document.getElementById('sendButton');
-const requestBtn = document.getElementById('requestButton');
-const statusDisplay = document.getElementById('status');
+        // Get UI elements
+        const connectBtn = document.getElementById('connect');
+        const disconnectBtn = document.getElementById('disconnect');
+        const sendBtn = document.getElementById('sendButton');
+        const requestBtn = document.getElementById('requestButton');
+        const statusDisplay = document.getElementById('status');
 
-// Slider mappings to match original Japanese interface
-const sliders = {
-    dx0: document.getElementById('dx0'),   // volumeSlider0 - A0 Right Rim
-    dx1: document.getElementById('dx1'),   // volumeSlider1 - A1 Right Surface  
-    dx2: document.getElementById('dx2'),   // volumeSlider2 - A2 Left Surface
-    dx3: document.getElementById('dx3'),   // volumeSlider3 - A3 Left Rim
-    dx4: document.getElementById('dx4'),   // volumeSlider4 - B-delay
-    dx5: document.getElementById('dx5'),   // volumeSlider5 - C-delay
-    dx6: document.getElementById('dx6'),   // volumeSlider6 - D-delay
-    dx7: document.getElementById('dx7'),   // volumeSlider7 - H-delay
-    dx8: document.getElementById('dx8')    // volumeSlider8 - A-delay
-};
+        // Slider mappings to match original Japanese interface
+        const sliders = {
+            dx0: document.getElementById('dx0'),   // volumeSlider0 - A0 Right Rim
+            dx1: document.getElementById('dx1'),   // volumeSlider1 - A1 Right Surface  
+            dx2: document.getElementById('dx2'),   // volumeSlider2 - A2 Left Surface
+            dx3: document.getElementById('dx3'),   // volumeSlider3 - A3 Left Rim
+            dx4: document.getElementById('dx4'),   // volumeSlider4 - B-delay
+            dx5: document.getElementById('dx5'),   // volumeSlider5 - C-delay
+            dx6: document.getElementById('dx6'),   // volumeSlider6 - D-delay
+            dx7: document.getElementById('dx7'),   // volumeSlider7 - H-delay
+            dx8: document.getElementById('dx8')    // volumeSlider8 - A-delay
+        };
 
-const valueDisplays = {
-    dx0: document.getElementById('valueDx0'),
-    dx1: document.getElementById('valueDx1'),
-    dx2: document.getElementById('valueDx2'),
-    dx3: document.getElementById('valueDx3'),
-    dx4: document.getElementById('valueDx4'),
-    dx5: document.getElementById('valueDx5'),
-    dx6: document.getElementById('valueDx6'),
-    dx7: document.getElementById('valueDx7'),
-    dx8: document.getElementById('valueDx8')
-};
+        const valueDisplays = {
+            dx0: document.getElementById('valueDx0'),
+            dx1: document.getElementById('valueDx1'),
+            dx2: document.getElementById('valueDx2'),
+            dx3: document.getElementById('valueDx3'),
+            dx4: document.getElementById('valueDx4'),
+            dx5: document.getElementById('valueDx5'),
+            dx6: document.getElementById('valueDx6'),
+            dx7: document.getElementById('valueDx7'),
+            dx8: document.getElementById('valueDx8')
+        };
 
-// Update slider background visual
-function updateSliderBackground(slider) {
-    const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-    slider.style.background = `linear-gradient(90deg, #4299e1 ${value}%, #e2e8f0 ${value}%)`;
-}
-
-// Initialize all sliders
-Object.values(sliders).forEach(slider => {
-    updateSliderBackground(slider);
-    slider.addEventListener('input', function() {
-        const key = Object.keys(sliders).find(k => sliders[k] === this);
-        valueDisplays[key].textContent = this.value;
-        updateSliderBackground(this);
-        if (isConnected) {
-            sendCurrentValues();
+        // Update slider background visual
+        function updateSliderBackground(slider) {
+            const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+            slider.style.background = `linear-gradient(90deg, #4299e1 ${value}%, #e2e8f0 ${value}%)`;
         }
-    });
-});
 
-// WebUSB Connection (WORKING VERSION - FIXED)
-async function connectDevice() {
-    console.log('Connect button clicked - starting WebUSB connection...');
-    
-    // Check WebUSB support
-    if (!navigator.usb) {
-        statusDisplay.textContent = 'WebUSB not supported in this browser';
-        console.error('WebUSB not supported');
-        return;
-    }
-    
-    console.log('WebUSB supported, attempting device request...');
-    
-    try {
-        console.log('Calling navigator.usb.requestDevice...');
-        
-        // Filter to show only RP2040/HIDtaiko devices
-        const device = await navigator.usb.requestDevice({
-            filters: [
-                { vendorId: 0x2E8A }, // Raspberry Pi Foundation (RP2040)
-                { vendorId: 0x239A }, // Adafruit RP2040
-                { productName: 'rp2040 connector' }, // Your specific device
-                { manufacturerName: 'Integrated Technology Express, Inc.' } // Your device manufacturer
-            ]
-        });
-        
-        console.log('Device selected:', device);
-        console.log('Device info:', {
-            productName: device.productName,
-            manufacturerName: device.manufacturerName,
-            vendorId: device.vendorId,
-            productId: device.productId
-        });
-        
-        await device.open();
-        console.log('Device opened successfully');
-        
-        if (device.configuration === null) {
-            await device.selectConfiguration(1);
-            console.log('Configuration selected');
-        }
-        
-        await device.claimInterface(0);
-        console.log('Interface claimed');
-        
-        port = device;
-        isConnected = true;
-        
-        statusDisplay.textContent = `Connected to ${device.productName || 'HIDtaiko RP2040'}`;
-        statusDisplay.className = 'status connected';
-        
-        connectBtn.disabled = true;
-        disconnectBtn.disabled = false;
-        sendBtn.disabled = false;
-        requestBtn.disabled = false;
-        
-        // Start listening for data
-        readLoop();
-        
-        console.log('HIDtaiko connected successfully!');
-        
-    } catch (error) {
-        console.error('Connection failed:', error);
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        
-        let errorMessage = 'Connection failed';
-        if (error.name === 'NotFoundError') {
-            errorMessage = 'No HIDtaiko device selected. Please select your rp2040 connector.';
-        } else if (error.name === 'NetworkError') {
-            errorMessage = 'Device connection failed - try different USB port';
-        } else if (error.name === 'InvalidStateError') {
-            errorMessage = 'Device already in use by another application';
-        } else if (error.name === 'NotSupportedError') {
-            errorMessage = 'WebUSB not supported - use Chrome 89+ or Edge 89+';
-        } else if (error.name === 'SecurityError') {
-            errorMessage = 'WebUSB blocked - must be triggered by user click';
-        } else {
-            errorMessage = `Connection failed: ${error.message}`;
-        }
-        
-        statusDisplay.textContent = errorMessage;
-        statusDisplay.className = 'status';
-    }
-}
-
-async function disconnectDevice() {
-    console.log('Disconnecting from HIDtaiko device...');
-    
-    isConnected = false;
-    
-    // Close WebUSB device
-    if (port) {
-        try {
-            await port.close();
-        } catch (error) {
-            console.error('Device close error:', error);
-        }
-        port = null;
-    }
-    
-    writer = null;
-    reader = null;
-    
-    statusDisplay.textContent = 'Disconnected';
-    statusDisplay.className = 'status';
-    
-    connectBtn.disabled = false;
-    disconnectBtn.disabled = true;
-    sendBtn.disabled = true;
-    requestBtn.disabled = true;
-    
-    console.log('HIDtaiko device disconnected');
-}
-
-async function readLoop() {
-    if (!port || !isConnected) return;
-    
-    try {
-        const result = await port.transferIn(1, 64);
-        if (result.data && result.data.byteLength > 0) {
-            const decoder = new TextDecoder();
-            const text = decoder.decode(result.data);
-            console.log('Received:', text);
-            
-            // Parse received data and update sliders
-            parseReceivedData(text);
-        }
-        
-        // Continue reading
-        if (isConnected) {
-            setTimeout(readLoop, 10);
-        }
-    } catch (error) {
-        console.error('Read error:', error);
-        if (isConnected) {
-            setTimeout(readLoop, 100);
-        }
-    }
-}
-
-function parseReceivedData(data) {
-    // Parse data format from original Japanese interface
-    try {
-        const lines = data.trim().split('\n');
-        const values = lines.map(line => parseInt(line.trim())).filter(v => !isNaN(v));
-        
-        if (values.length >= 9) {
-            // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
-            const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
-            
-            values.forEach((value, index) => {
-                if (mapping[index] && sliders[mapping[index]]) {
-                    sliders[mapping[index]].value = value;
-                    valueDisplays[mapping[index]].textContent = value;
-                    updateSliderBackground(sliders[mapping[index]]);
+        // Initialize all sliders
+        Object.values(sliders).forEach(slider => {
+            updateSliderBackground(slider);
+            slider.addEventListener('input', function() {
+                const key = Object.keys(sliders).find(k => sliders[k] === this);
+                valueDisplays[key].textContent = this.value;
+                updateSliderBackground(this);
+                if (isConnected) {
+                    sendCurrentValues();
                 }
             });
+        });
+
+        // WebUSB Connection (WORKING VERSION - FIXED)
+        async function connectDevice() {
+            console.log('Connect button clicked - starting WebUSB connection...');
             
-            console.log('Updated sliders with received values:', values);
+            // Check WebUSB support
+            if (!navigator.usb) {
+                statusDisplay.textContent = 'WebUSB not supported in this browser';
+                console.error('WebUSB not supported');
+                return;
+            }
+            
+            console.log('WebUSB supported, attempting device request...');
+            
+            try {
+                console.log('Calling navigator.usb.requestDevice...');
+                
+                // Filter to show only RP2040/HIDtaiko devices
+                const device = await navigator.usb.requestDevice({
+                    filters: [
+                        { vendorId: 0x2E8A }, // Raspberry Pi Foundation (RP2040)
+                        { vendorId: 0x239A }, // Adafruit RP2040
+                        { productName: 'rp2040 connector' }, // Your specific device
+                        { manufacturerName: 'Integrated Technology Express, Inc.' } // Your device manufacturer
+                    ]
+                });
+                
+                console.log('Device selected:', device);
+                console.log('Device info:', {
+                    productName: device.productName,
+                    manufacturerName: device.manufacturerName,
+                    vendorId: device.vendorId,
+                    productId: device.productId
+                });
+                
+                await device.open();
+                console.log('Device opened successfully');
+                
+                if (device.configuration === null) {
+                    await device.selectConfiguration(1);
+                    console.log('Configuration selected');
+                }
+                
+                await device.claimInterface(0);
+                console.log('Interface claimed');
+                
+                port = device;
+                isConnected = true;
+                
+                statusDisplay.textContent = `Connected to ${device.productName || 'HIDtaiko RP2040'}`;
+                statusDisplay.className = 'status connected';
+                
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                sendBtn.disabled = false;
+                requestBtn.disabled = false;
+                
+                // Start listening for data
+                readLoop();
+                
+                console.log('HIDtaiko connected successfully!');
+                
+            } catch (error) {
+                console.error('Connection failed:', error);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+                
+                let errorMessage = 'Connection failed';
+                if (error.name === 'NotFoundError') {
+                    errorMessage = 'No HIDtaiko device selected. Please select your rp2040 connector.';
+                } else if (error.name === 'NetworkError') {
+                    errorMessage = 'Device connection failed - try different USB port';
+                } else if (error.name === 'InvalidStateError') {
+                    errorMessage = 'Device already in use by another application';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage = 'WebUSB not supported - use Chrome 89+ or Edge 89+';
+                } else if (error.name === 'SecurityError') {
+                    errorMessage = 'WebUSB blocked - must be triggered by user click';
+                } else {
+                    errorMessage = `Connection failed: ${error.message}`;
+                }
+                
+                statusDisplay.textContent = errorMessage;
+                statusDisplay.className = 'status';
+            }
         }
-    } catch (error) {
-        console.error('Parse error:', error);
-    }
-}
 
-async function sendCurrentValues() {
-    if (!port || !isConnected) return;
-    
-    try {
-        // Send data in the format expected by the RP2040 firmware (WebUSB binary)
-        const data = new Uint8Array([
-            parseInt(sliders.dx1.value), // A1 - volumeSlider1
-            parseInt(sliders.dx0.value), // A0 - volumeSlider0  
-            parseInt(sliders.dx2.value), // A2 - volumeSlider2
-            parseInt(sliders.dx3.value), // A3 - volumeSlider3
-            parseInt(sliders.dx4.value), // B - volumeSlider4
-            parseInt(sliders.dx5.value), // C - volumeSlider5
-            parseInt(sliders.dx6.value), // D - volumeSlider6
-            parseInt(sliders.dx7.value), // H - volumeSlider7
-            parseInt(sliders.dx8.value)  // A - volumeSlider8
-        ]);
-        
-        await port.transferOut(1, data);
-        console.log('Sent values:', Array.from(data));
-        
-    } catch (error) {
-        console.error('Send error:', error);
-        statusDisplay.textContent = 'Send failed: ' + error.message;
-    }
-}
+        async function disconnectDevice() {
+            console.log('Disconnecting from HIDtaiko device...');
+            
+            isConnected = false;
+            
+            // Close WebUSB device
+            if (port) {
+                try {
+                    await port.close();
+                } catch (error) {
+                    console.error('Device close error:', error);
+                }
+                port = null;
+            }
+            
+            writer = null;
+            reader = null;
+            
+            statusDisplay.textContent = 'Disconnected';
+            statusDisplay.className = 'status';
+            
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            sendBtn.disabled = true;
+            requestBtn.disabled = true;
+            
+            console.log('HIDtaiko device disconnected');
+        }
 
-async function requestValues() {
-    if (!port || !isConnected) return;
-    
-    try {
-        // Send request command (based on original interface)
-        const data = new Uint8Array([255]); // Request command
-        await port.transferOut(1, data);
-        console.log('Requested current values');
-        
-    } catch (error) {
-        console.error('Request error:', error);
-        statusDisplay.textContent = 'Request failed: ' + error.message;
-    }
-}
+        async function readLoop() {
+            if (!port || !isConnected) return;
+            
+            try {
+                const result = await port.transferIn(1, 64);
+                if (result.data && result.data.byteLength > 0) {
+                    const decoder = new TextDecoder();
+                    const text = decoder.decode(result.data);
+                    console.log('Received:', text);
+                    
+                    // Parse received data and update sliders
+                    parseReceivedData(text);
+                }
+                
+                // Continue reading
+                if (isConnected) {
+                    setTimeout(readLoop, 10);
+                }
+            } catch (error) {
+                console.error('Read error:', error);
+                if (isConnected) {
+                    setTimeout(readLoop, 100);
+                }
+            }
+        }
 
-async function saveToMemory() {
-    if (!port || !isConnected) return;
-    
-    try {
-        // Send save command (WebUSB binary)
-        const data = new Uint8Array([254]); // Save command
-        await port.transferOut(1, data);
-        console.log('Save command sent');
-        
-        // Visual feedback
+        function parseReceivedData(data) {
+            // Parse data format from original Japanese interface
+            try {
+                const lines = data.trim().split('\n');
+                const values = lines.map(line => parseInt(line.trim())).filter(v => !isNaN(v));
+                
+                if (values.length >= 9) {
+                    // Map to sliders: [A1, A0, A2, A3, B, C, D, H, A] based on original order
+                    const mapping = ['dx1', 'dx0', 'dx2', 'dx3', 'dx4', 'dx5', 'dx6', 'dx7', 'dx8'];
+                    
+                    values.forEach((value, index) => {
+                        if (mapping[index] && sliders[mapping[index]]) {
+                            sliders[mapping[index]].value = value;
+                            valueDisplays[mapping[index]].textContent = value;
+                            updateSliderBackground(sliders[mapping[index]]);
+                        }
+                    });
+                    
+                    console.log('Updated sliders with received values:', values);
+                }
+            } catch (error) {
+                console.error('Parse error:', error);
+            }
+        }
+
+        async function sendCurrentValues() {
+            if (!port || !isConnected) return;
+            
+            try {
+                // Send data in the format expected by the RP2040 firmware (WebUSB binary)
+                const data = new Uint8Array([
+                    parseInt(sliders.dx1.value), // A1 - volumeSlider1
+                    parseInt(sliders.dx0.value), // A0 - volumeSlider0  
+                    parseInt(sliders.dx2.value), // A2 - volumeSlider2
+                    parseInt(sliders.dx3.value), // A3 - volumeSlider3
+                    parseInt(sliders.dx4.value), // B - volumeSlider4
+                    parseInt(sliders.dx5.value), // C - volumeSlider5
+                    parseInt(sliders.dx6.value), // D - volumeSlider6
+                    parseInt(sliders.dx7.value), // H - volumeSlider7
+                    parseInt(sliders.dx8.value)  // A - volumeSlider8
+                ]);
+                
+                await port.transferOut(1, data);
+                console.log('Requested current values');
+                
+            } catch (error) {
+                console.error('Request error:', error);
+                statusDisplay.textContent = 'Request failed: ' + error.message;
+            }
+        }
+
+        async function saveToMemory() {
+            if (!port || !isConnected) return;
+            
+            try {
+                // Send save command (WebUSB binary)
+                const data = new Uint8Array([254]); // Save command
+                await port.transferOut(1, data);
+                console.log('Save command sent');
+                
+                // Visual feedback
+                const saveBtn = document.getElementById('saveButton');
+                if (saveBtn) {
+                    const originalText = saveBtn.textContent;
+                    saveBtn.textContent = 'Saved!';
+                    saveBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+                    
+                    setTimeout(() => {
+                        saveBtn.textContent = originalText;
+                        saveBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
+                    }, 2000);
+                }
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                statusDisplay.textContent = 'Save failed: ' + error.message;
+            }
+        }
+
+        // Event listeners
+        connectBtn.addEventListener('click', connectDevice);
+        disconnectBtn.addEventListener('click', disconnectDevice);
+        sendBtn.addEventListener('click', sendCurrentValues);
+        requestBtn.addEventListener('click', requestValues);
+
+        // Add save button listener if it exists
         const saveBtn = document.getElementById('saveButton');
         if (saveBtn) {
-            const originalText = saveBtn.textContent;
-            saveBtn.textContent = 'Saved!';
-            saveBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
-            
-            setTimeout(() => {
-                saveBtn.textContent = originalText;
-                saveBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
-            }, 2000);
+            saveBtn.addEventListener('click', saveToMemory);
         }
-        
-    } catch (error) {
-        console.error('Save error:', error);
-        statusDisplay.textContent = 'Save failed: ' + error.message;
-    }
-}
 
-// Event listeners
-connectBtn.addEventListener('click', connectDevice);
-disconnectBtn.addEventListener('click', disconnectDevice);
-sendBtn.addEventListener('click', sendCurrentValues);
-requestBtn.addEventListener('click', requestValues);
+        // Check for WebUSB support
+        if (!navigator.usb) {
+            statusDisplay.textContent = 'WebUSB not supported. Use Chrome 89+ or Edge 89+.';
+            statusDisplay.className = 'status';
+            connectBtn.disabled = true;
+        } else {
+            statusDisplay.textContent = 'Ready to connect (WebUSB API)';
+            statusDisplay.className = 'status';
+        }
+    </script>
+</body>
+</html>, data);
+                console.log('Sent values:', Array.from(data));
+                
+            } catch (error) {
+                console.error('Send error:', error);
+                statusDisplay.textContent = 'Send failed: ' + error.message;
+            }
+        }
 
-// Add save button listener if it exists
-const saveBtn = document.getElementById('saveButton');
-if (saveBtn) {
-    saveBtn.addEventListener('click', saveToMemory);
-}
-
-// Check for WebUSB support
-if (!navigator.usb) {
-    statusDisplay.textContent = 'WebUSB not supported. Use Chrome 89+ or Edge 89+.';
-    statusDisplay.className = 'status';
-    connectBtn.disabled = true;
-} else {
-    statusDisplay.textContent = 'Ready to connect (WebUSB API)';
-    statusDisplay.className = 'status';
-}
+        async function requestValues() {
+            if (!port || !isConnected) return;
+            
+            try {
+                // Send request command (based on original interface)
+                const data = new Uint8Array([255]); // Request command
+                await port.transferOut(1
