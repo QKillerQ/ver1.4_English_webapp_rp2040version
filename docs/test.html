@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebUSB Test</title>
+</head>
+<body>
+    <h1>WebUSB Connection Test</h1>
+    
+    <button id="testConnect">Test Connect</button>
+    <div id="status">Ready</div>
+    <div id="console"></div>
+
+    <script>
+        console.log('Script loaded');
+        
+        const btn = document.getElementById('testConnect');
+        const status = document.getElementById('status');
+        const consoleDiv = document.getElementById('console');
+        
+        function log(message) {
+            console.log(message);
+            consoleDiv.innerHTML += '<div>' + message + '</div>';
+        }
+        
+        log('Page loaded');
+        log('Navigator.usb available: ' + ('usb' in navigator));
+        log('Current URL: ' + window.location.href);
+        log('Protocol: ' + window.location.protocol);
+        
+        btn.addEventListener('click', async function() {
+            log('Button clicked!');
+            status.textContent = 'Button clicked, attempting WebUSB...';
+            
+            if (!navigator.usb) {
+                log('ERROR: WebUSB not supported');
+                status.textContent = 'WebUSB not supported';
+                return;
+            }
+            
+            try {
+                log('Calling requestDevice...');
+                const device = await navigator.usb.requestDevice({
+                    filters: []
+                });
+                
+                log('SUCCESS: Device selected: ' + device.productName);
+                status.textContent = 'Device connected: ' + device.productName;
+                
+            } catch (error) {
+                log('ERROR: ' + error.name + ' - ' + error.message);
+                status.textContent = 'Error: ' + error.message;
+            }
+        });
+        
+        log('Event listener attached');
+    </script>
+</body>
+</html>
