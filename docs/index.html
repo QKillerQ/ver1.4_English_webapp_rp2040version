@@ -123,7 +123,7 @@
             <button id="disconnect" class="btn" disabled>Disconnect</button>
             <button id="defaultValues" class="btn default" disabled>Default Values</button>
             <button id="saveToDevice" class="btn save" disabled>Save To Device</button>
-            <button id="requestValues" class="btn" disabled>Request Loaded Values</button>
+            <button id="requestValues" class="btn" disabled>Load Last Settings</button>
         </div>
 
         <div class="slider-container">
@@ -236,6 +236,15 @@
                 requestValuesBtn.disabled = false;
 
                 console.log('✅ Connected successfully!');
+                
+                // Auto-load saved settings when connecting
+                setTimeout(() => {
+                    if (window.hidtaikoSettings) {
+                        console.log('🔄 Auto-loading previously saved settings...');
+                        loadSavedSettings();
+                    }
+                }, 500);
+                
                 readLoop();
 
             } catch (error) {
@@ -333,6 +342,9 @@
                 
                 console.log('✅ Save command sent');
                 
+                // Also save current settings to browser storage for recall
+                saveSettingsLocally();
+                
                 saveToDeviceBtn.textContent = 'Saved!';
                 setTimeout(() => {
                     saveToDeviceBtn.textContent = 'Save To Device';
@@ -343,9 +355,59 @@
             }
         }
 
-        // Request values from device
+        // Save current settings to browser storage
+        function saveSettingsLocally() {
+            const currentSettings = {
+                dx0: parseInt(sliders.dx0.value),
+                dx1: parseInt(sliders.dx1.value),
+                dx2: parseInt(sliders.dx2.value),
+                dx3: parseInt(sliders.dx3.value),
+                timestamp: new Date().toISOString(),
+                deviceInfo: port ? port.getInfo() : null
+            };
+            
+            // Store in browser memory (not localStorage due to Claude limitations)
+            window.hidtaikoSettings = currentSettings;
+            console.log('💾 Settings saved locally:', currentSettings);
+        }
+
+        // Load previously saved settings from browser storage
+        function loadSavedSettings() {
+            if (window.hidtaikoSettings) {
+                const settings = window.hidtaikoSettings;
+                console.log('📤 Loading saved settings:', settings);
+                
+                // Update sliders with saved values
+                Object.keys(settings).forEach(key => {
+                    if (sliders[key] && typeof settings[key] === 'number') {
+                        sliders[key].value = settings[key];
+                        valueDisplays[key].textContent = settings[key];
+                    }
+                });
+                
+                console.log('✅ Saved settings loaded successfully!');
+                statusDisplay.textContent = `Settings loaded from ${new Date(settings.timestamp).toLocaleString()}`;
+                
+                return true;
+            } else {
+                console.log('⚠️ No saved settings found');
+                statusDisplay.textContent = 'No saved settings found - use Default Values';
+                return false;
+            }
+        }
+
+        // Request values from device (enhanced with local fallback)
         async function requestValues() {
-            if (!writer || !isConnected) return;
+            if (!isConnected) {
+                // If not connected, try to load from local storage
+                const loaded = loadSavedSettings();
+                if (!loaded) {
+                    alert('No saved settings found. Connect device and save settings first, or use Default Values.');
+                }
+                return;
+            }
+
+            if (!writer) return;
 
             try {
                 console.log('🔍 Requesting values from device...');
@@ -360,6 +422,18 @@
                 }
                 
                 console.log('📡 All commands sent, monitoring for response...');
+                
+                // Wait 2 seconds for device response
+                await new Promise(r => setTimeout(r, 2000));
+                
+                // If no response from device, fall back to local storage
+                console.log('⚠️ Device did not respond, falling back to local storage...');
+                const loaded = loadSavedSettings();
+                
+                if (!loaded) {
+                    console.log('💡 No local settings either - consider using Default Values');
+                    alert('Device does not respond to read commands, and no local settings found.\n\nRecommendation:\n1. Use "Default Values" to start\n2. Adjust settings as needed\n3. "Save To Device" to store permanently');
+                }
 
             } catch (error) {
                 console.error('❌ Request error:', error);
